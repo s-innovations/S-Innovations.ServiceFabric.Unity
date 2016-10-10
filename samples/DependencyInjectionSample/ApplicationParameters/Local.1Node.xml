@@ -2,14 +2,5 @@
 <Application xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Name="fabric:/DependencyInjectionSample" xmlns="http://schemas.microsoft.com/2011/01/fabric">
   <Parameters>
     <Parameter Name="DependencyInjectionServiceSample_InstanceCount" Value="1" />
-    <Parameter Name="DependencyInjectionActorSampleActorService_PartitionCount" Value="1" />
-    <Parameter Name="DependencyInjectionActorSampleActorService_TargetReplicaSetSize" Value="1" />
-    <Parameter Name="DependencyInjectionActorSampleActorService_MinReplicaSetSize" Value="1" />
-    <Parameter Name="MyTestActorService_PartitionCount" Value="1" />
-    <Parameter Name="MyTestActorService_TargetReplicaSetSize" Value="1" />
-    <Parameter Name="MyTestActorService_MinReplicaSetSize" Value="1" />
-    <Parameter Name="MySecondTestActorService_PartitionCount" Value="1" />
-    <Parameter Name="MySecondTestActorService_TargetReplicaSetSize" Value="1" />
-    <Parameter Name="MySecondTestActorService_MinReplicaSetSize" Value="1" />
   </Parameters>
 </Application>

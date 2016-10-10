@@ -89,9 +89,9 @@ namespace DependencyInjectionServiceSample
 
             protected override async Task RunAsync(CancellationToken cancellationToken)
             {
-                
 
-               
+          
+
 
                 await base.RunAsync(cancellationToken);
             }
@@ -102,7 +102,9 @@ namespace DependencyInjectionServiceSample
 
                 string serverUrl = $"{endpoint.Protocol}://{FabricRuntime.GetNodeContext().IPAddressOrFQDN}:{endpoint.Port}";
 
-                _webHost = new WebHostBuilder().ConfigureServices(services=> { }).UseKestrel()
+                _webHost = new WebHostBuilder().ConfigureServices(services=> { })
+                                               .UseLoggerFactory(_services.GetService<ILoggerFactory>())
+                                               .UseKestrel()
                                                .UseContentRoot(Directory.GetCurrentDirectory())
                                                .UseStartup<Startup>()
                                                .UseUrls(serverUrl)

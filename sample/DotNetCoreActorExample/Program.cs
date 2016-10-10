@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
-using DependencyInjectionActorSample.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Practices.Unity;
@@ -27,8 +26,56 @@ namespace DependencyInjectionActorSample
             
         }
     }
+    public interface IMyTestActor : IActor
+    {
+        Task StartAsync();
+    }
+
+    public interface IMySecondTestActor : IActor
+    {
+        Task DoWorkAsync();
+    }
+
+    /// <summary>
+    /// This interface defines the methods exposed by an actor.
+    /// Clients use this interface to interact with the actor that implements it.
+    /// </summary>
+    public interface IDependencyInjectionActorSample : IActor
+    {
+        /// <summary>
+        /// TODO: Replace with your own actor method.
+        /// </summary>
+        /// <returns></returns>
+        Task<int> GetCountAsync();
+
+        /// <summary>
+        /// TODO: Replace with your own actor method.
+        /// </summary>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        Task SetCountAsync(int count);
+    }
 
 
+    /// <summary>
+    /// This interface defines the methods exposed by an actor.
+    /// Clients use this interface to interact with the actor that implements it.
+    /// </summary>
+    public interface IDependencyInjectionActorSample1 : IActor
+    {
+        /// <summary>
+        /// TODO: Replace with your own actor method.
+        /// </summary>
+        /// <returns></returns>
+        Task<int> GetCountAsync();
+
+        /// <summary>
+        /// TODO: Replace with your own actor method.
+        /// </summary>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        Task SetCountAsync(int count);
+    }
 
 
     [StatePersistence(StatePersistence.Persisted)]

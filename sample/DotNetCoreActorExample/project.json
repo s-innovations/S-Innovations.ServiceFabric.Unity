@@ -1,0 +1,34 @@
+﻿{
+  "version": "1.0.0-*",
+  "buildOptions": {
+    "emitEntryPoint": true
+  },
+
+  "dependencies": {
+    "Microsoft.Extensions.Logging": "1.0.0",
+    "Serilog.Sinks.Trace": "2.0.0",
+    "Serilog.Extensions.Logging": "1.2.0",
+    "Unity": "4.0.1",
+    "S-Innovations.ServiceFabric.Unity": "1.0.0-*"
+  },
+
+  "frameworks": {
+    "net452": {
+      "dependencies": {
+        "Microsoft.ServiceFabric": "5.2.207",
+        "Microsoft.ServiceFabric.Data": "2.2.207",
+        "Microsoft.ServiceFabric.Services": "2.2.207",
+        "Microsoft.ServiceFabric.Actors": "2.2.207"
+      }
+    }
+  },
+
+  "scripts": {
+    "prepublish": [
+      "cmd /c copy ..\\..\\packages\\Microsoft.ServiceFabric.Actors.2.2.207\\build\\FabActUtil.exe .\\bin\\Debug\\net452\\win7-x64\\FabActUtil.exe",
+      ".\\bin\\Debug\\net452\\win7-x64\\FabActUtil.exe /spp:PackageRoot /t:manifest /sp:DotNetCoreActorExample /in:.\\bin\\Debug\\net452\\win7-x64\\DotNetCoreActorExample.exe",
+      "cmd /c del .\\bin\\Debug\\net452\\win7-x64\\FabActUtil.exe"
+    ]
+  }
+
+}

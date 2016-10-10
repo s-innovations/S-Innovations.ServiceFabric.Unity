@@ -29,7 +29,7 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DependencyInjectionActorSample\DependencyInjectionActorSample.csproj" />
+    <ProjectReference Include="..\..\sample\DotNetCoreActorExample\DotNetCoreActorExample.xproj" />
     <ProjectReference Include="..\DependencyInjectionServiceSample\DependencyInjectionServiceSample.xproj" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
