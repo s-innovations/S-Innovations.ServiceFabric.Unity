@@ -15,3 +15,15 @@ The current sample uses Unity, but the goal is to move away from a specific cont
 
 Every new actor or service created will have a scoped container, such all scoped dependency registrations will be disposed if implementing IDisposable when the actor is garbage collected.
 
+### Scoped Lifetime
+
+In Unity, you will register dependencies for scoped lifetime like this:
+```
+ container.RegisterType<From,To>(new HierarchicalLifetimeManager());
+```
+
+## TODO
+
+- [ ] Remove dependency on unity
+- [ ] Use CoreCLR dependency injection instead
+- [ ] When dotnet core 1.1.0 is out, its possible to make services go from main.cs to startup.cs.

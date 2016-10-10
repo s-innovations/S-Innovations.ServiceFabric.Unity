@@ -4,6 +4,7 @@ using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
 using DependencyInjectionActorSample.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Practices.Unity;
 using Microsoft.ServiceFabric.Actors;
@@ -15,21 +16,37 @@ using SInnovations.ServiceFabric.Unity;
 namespace DependencyInjectionActorSample
 {
 
-   
+    public interface IMyScopedDependency : IDisposable {
+
+    }
+
+    public class MyScopedDependency : IMyScopedDependency
+    {
+        public void Dispose()
+        {
+            
+        }
+    }
+
+
+
 
     [StatePersistence(StatePersistence.Persisted)]
     public class MyTestActor : Actor, IMyTestActor, IRemindable
     {
         private readonly ILogger<MyTestActor> _logger;
         private readonly IServiceProvider _services;
+        private readonly IServiceScopeFactory _scopes;
         public MyTestActor(
             ActorService actorService, ActorId actorId,
             ILoggerFactory logger,
-            IServiceProvider services
+            IServiceProvider services,
+            IServiceScopeFactory scopes
             ) : base(actorService, actorId)
         {
             this._logger = logger.CreateLogger<MyTestActor>();
             this._services = services;
+            this._scopes = scopes;
         }
 
         /// <summary>
@@ -51,7 +68,31 @@ namespace DependencyInjectionActorSample
         public async Task ReceiveReminderAsync(string reminderName, byte[] context, TimeSpan dueTime, TimeSpan period)
         {
             _logger.LogInformation("Reminder {reminderName} of {ActorName} is triggered", reminderName, nameof(MyTestActor));
+
+
             await ActorProxy.Create<IMySecondTestActor>(this.GetActorId()).DoWorkAsync();
+
+            // dependency1 will 
+            var dependency1 = _services.GetService<IMyScopedDependency>();
+            var dependency2 = _services.GetService<IMyScopedDependency>();
+
+            if(dependency1.GetHashCode() != dependency2.GetHashCode())
+            {
+                throw new Exception("Should be the same dependencies");
+            }
+            using (var scope = _scopes.CreateScope())
+            {
+
+                var dependency3 = scope.ServiceProvider.GetService<IMyScopedDependency>();
+                if (dependency1.GetHashCode() == dependency3.GetHashCode())
+                {
+                    throw new Exception("Should be different dependencies");
+                }
+
+
+            }
+
+
         }
 
         public async Task StartAsync()
@@ -140,6 +181,8 @@ namespace DependencyInjectionActorSample
                     var loggerfac = new LoggerFactory() as ILoggerFactory;
                     loggerfac.AddSerilog();
                     container.RegisterInstance(loggerfac);
+
+                    container.RegisterType<IMyScopedDependency, MyScopedDependency>(new HierarchicalLifetimeManager());
                     
                     container.WithActor<MyTestActor>(new ActorServiceSettings()
                     {

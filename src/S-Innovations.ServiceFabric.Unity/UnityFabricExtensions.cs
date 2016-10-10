@@ -12,18 +12,27 @@ using Microsoft.ServiceFabric.Services.Runtime;
 
 namespace SInnovations.ServiceFabric.Unity
 {
-    public class UnityIServiceScope : IServiceScope
+    public class UnityServiceScope : IServiceScope
     {
-        public UnityServiceProvider ServiceProvider
+        private readonly IUnityContainer container;
+        private bool _containerOwner;
+        public UnityServiceScope(IUnityContainer container, bool containerOwner = false)
         {
-            get;internal set;
+            this.container = container;
+            this._containerOwner = containerOwner;
         }
+        
+        IServiceProvider IServiceScope.ServiceProvider => this.container.Resolve<IServiceProvider>();
 
-        IServiceProvider IServiceScope.ServiceProvider => ServiceProvider;        
-
+       
         public void Dispose()
         {
-            ServiceProvider.Dispose();
+         
+            if (_containerOwner)
+            {
+                _containerOwner = false;
+                this.container.Dispose();
+            }
         }        
     }
 
@@ -36,25 +45,22 @@ namespace SInnovations.ServiceFabric.Unity
         }
         public IServiceScope CreateScope()
         {
-            return new UnityIServiceScope { ServiceProvider = new UnityServiceProvider(container.CreateChildContainer()) };
+            return new UnityServiceScope(container.CreateChildContainer(),true);
+           
+           // return new UnityIServiceScope { ServiceProvider = new UnityServiceProvider(container.CreateChildContainer()) };
         }
     }
-    public class UnityServiceProvider : IServiceProvider, ISupportRequiredService, IDisposable
+    public class UnityServiceProvider : IServiceProvider
     {
+        private readonly IUnityContainer _container;
         public UnityServiceProvider(IUnityContainer container)
         {
-            Container = container;
-            Container.RegisterType<IServiceScopeFactory, UnityServiceScopeFactory>(new ContainerControlledLifetimeManager(), new InjectionFactory(c => new UnityServiceScopeFactory(c)));
-
+            _container = container;
+            
         }
 
-        private IUnityContainer Container { get; }
+        public object GetService(Type serviceType) => _container.Resolve(serviceType);
 
-        public object GetRequiredService(Type serviceType) => Container.Resolve(serviceType);
-
-        public object GetService(Type serviceType) => Container.Resolve(serviceType);
-
-        public void Dispose() => Container.Dispose();
     }
 
 
@@ -262,7 +268,11 @@ namespace SInnovations.ServiceFabric.Unity
         public static IUnityContainer AsFabricContainer(this IUnityContainer container, Func<IUnityContainer, FabricRuntime> factory)
         {
             container.RegisterType<FabricRuntime>(new ContainerControlledLifetimeManager(), new InjectionFactory(factory));
-            container.RegisterType<IServiceProvider, UnityServiceProvider>(new ContainerControlledLifetimeManager());
+            container.RegisterType<IServiceScopeFactory, UnityServiceScopeFactory>(new HierarchicalLifetimeManager());
+            container.RegisterType<IServiceScope, UnityServiceScope>(new HierarchicalLifetimeManager());
+            container.RegisterType<IServiceProvider, UnityServiceProvider>(new HierarchicalLifetimeManager());
+
+
             return container;
         }
 

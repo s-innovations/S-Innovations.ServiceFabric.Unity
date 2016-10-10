@@ -137,7 +137,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DependencyInjectionActorSample.Interfaces\DependencyInjectionActorSample.Interfaces.csproj">
-      <Project>{E5E4AB56-3BF0-489B-9990-2BC2E35729BE}</Project>
+      <Project>{e5e4ab56-3bf0-489b-9990-2bc2e35729be}</Project>
       <Name>DependencyInjectionActorSample.Interfaces</Name>
     </ProjectReference>
   </ItemGroup>
