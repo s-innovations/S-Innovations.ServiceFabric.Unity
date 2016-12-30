@@ -247,6 +247,14 @@ namespace SInnovations.ServiceFabric.Unity
 
     public static class UnityFabricExtensions
     {
+        public static IUnityContainer AsFabricContainer(this FabricRuntime runtime)
+        {
+            return new UnityContainer().RegisterInstance(runtime);
+        }
+        public static IUnityContainer ConfigureLogging(this IUnityContainer container,ILoggerFactory logger)
+        {
+            return container.RegisterInstance(logger);
+        }
         public static IUnityContainer AsFabricContainer(this IUnityContainer container)
         {
             return container.AsFabricContainer(c => FabricRuntime.Create());
