@@ -12,56 +12,42 @@ using Microsoft.ServiceFabric.Services.Runtime;
 
 namespace SInnovations.ServiceFabric.Unity
 {
-    public class UnityServiceScope : IServiceScope
-    {
-        private readonly IUnityContainer container;
-        private bool _containerOwner;
-        public UnityServiceScope(IUnityContainer container, bool containerOwner = false)
-        {
-            this.container = container;
-            this._containerOwner = containerOwner;
-        }
+    //public class UnityServiceScope : IServiceScope
+    //{
+    //    private readonly IUnityContainer container;
+    //    private bool _containerOwner;
+    //    public UnityServiceScope(IUnityContainer container, bool containerOwner = false)
+    //    {
+    //        this.container = container;
+    //        this._containerOwner = containerOwner;
+    //    }
         
-        IServiceProvider IServiceScope.ServiceProvider => this.container.Resolve<IServiceProvider>();
+    //    IServiceProvider IServiceScope.ServiceProvider => this.container.Resolve<IServiceProvider>();
 
        
-        public void Dispose()
-        {
+    //    public void Dispose()
+    //    {
          
-            if (_containerOwner)
-            {
-                _containerOwner = false;
-                this.container.Dispose();
-            }
-        }        
-    }
-
-    public class UnityServiceScopeFactory : IServiceScopeFactory
-    {
-        private readonly IUnityContainer container;
-        public UnityServiceScopeFactory(IUnityContainer container)
-        {
-            this.container = container;
-        }
-        public IServiceScope CreateScope()
-        {
-            return new UnityServiceScope(container.CreateChildContainer(),true);
-           
-           // return new UnityIServiceScope { ServiceProvider = new UnityServiceProvider(container.CreateChildContainer()) };
-        }
-    }
-    public class UnityServiceProvider : IServiceProvider
-    {
-        private readonly IUnityContainer _container;
-        public UnityServiceProvider(IUnityContainer container)
-        {
-            _container = container;
+    //        if (_containerOwner)
+    //        {
+    //            _containerOwner = false;
+    //            this.container.Dispose();
+    //        }
+    //    }        
+    //}
+   
+    //public class UnityServiceProvider : IServiceProvider
+    //{
+    //    private readonly IUnityContainer _container;
+    //    public UnityServiceProvider(IUnityContainer container)
+    //    {
+    //        _container = container;
             
-        }
+    //    }
 
-        public object GetService(Type serviceType) => _container.Resolve(serviceType);
+    //    public object GetService(Type serviceType) => _container.Resolve(serviceType);
 
-    }
+    //}
 
 
     /// <summary>
@@ -268,15 +254,14 @@ namespace SInnovations.ServiceFabric.Unity
         public static IUnityContainer AsFabricContainer(this IUnityContainer container, Func<IUnityContainer, FabricRuntime> factory)
         {
             container.RegisterType<FabricRuntime>(new ContainerControlledLifetimeManager(), new InjectionFactory(factory));
-            container.RegisterType<IServiceScopeFactory, UnityServiceScopeFactory>(new HierarchicalLifetimeManager());
-            container.RegisterType<IServiceScope, UnityServiceScope>(new HierarchicalLifetimeManager());
-            container.RegisterType<IServiceProvider, UnityServiceProvider>(new HierarchicalLifetimeManager());
+            //container.RegisterType<IServiceScopeFactory, UnityServiceScopeFactory>(new HierarchicalLifetimeManager());
+            //container.RegisterType<IServiceScope, UnityServiceScope>(new HierarchicalLifetimeManager());
+            //container.RegisterType<IServiceProvider, UnityServiceProvider>(new HierarchicalLifetimeManager());
 
-
-            return container;
+            return container.WithCoreCLR();
         }
 
-
+        
         public static IUnityContainer WithActor<TActor>(this IUnityContainer container, ActorServiceSettings settings = null) where TActor : ActorBase
         {
             var logger = container.Resolve<ILoggerFactory>().CreateLogger<TActor>();
