@@ -24,6 +24,8 @@ namespace SInnovations.ServiceFabric.Unity
             return type.GetGenericArguments();
         }
     }
+    
+
     public static class UnityGlueConfiguration
     {
         public static void Register(IServiceCollection services, IUnityContainer container)

@@ -4,8 +4,10 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.Practices.Unity;
 using Microsoft.ServiceFabric.Actors.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
@@ -259,9 +261,35 @@ namespace SInnovations.ServiceFabric.Unity
         {
             return container.AsFabricContainer(c => FabricRuntime.Create());
         }
+        public static IUnityContainer AddOptions(this IUnityContainer container)
+        {
+            return container.RegisterType(typeof(IOptions<>), typeof(OptionsManager<>));
+        }
+        public static IUnityContainer BuildConfiguration(this IUnityContainer container, IConfigurationBuilder builder)
+        {
+           return container.RegisterInstance(builder.Build());
+        }
+        public static IConfigurationRoot Build(this IConfigurationBuilder builder, IUnityContainer container)
+        {
+            var a = builder.Build();
+            container.RegisterInstance(a);
+            return a;
+        }
+        public static IUnityContainer Configure<T>(this IUnityContainer container, IConfigurationSection configuration) where T : class
+        {
+            container.RegisterInstance<IOptionsChangeTokenSource<T>>(typeof(T).AssemblyQualifiedName,new ConfigurationChangeTokenSource<T>(configuration));
+            container.RegisterInstance<IConfigureOptions<T>>(typeof(T).AssemblyQualifiedName, new ConfigureFromConfigurationOptions<T>(configuration));
+            return container;
+        }
+        public static IUnityContainer Configure<T>(this IUnityContainer container, string sectionName) where T : class
+        {
+            return container.Configure<T>(container.Resolve<IConfigurationRoot>().GetSection(sectionName));
+        }
         public static IUnityContainer AsFabricContainer(this IUnityContainer container, Func<IUnityContainer, FabricRuntime> factory)
         {
             container.RegisterType<FabricRuntime>(new ContainerControlledLifetimeManager(), new InjectionFactory(factory));
+            container.RegisterType<ICodePackageActivationContext>(new ContainerControlledLifetimeManager(), new InjectionFactory(c => FabricRuntime.GetActivationContext()));
+            container.RegisterType<ConfigurationPackage>(new ContainerControlledLifetimeManager(), new InjectionFactory((c) => c.Resolve<ICodePackageActivationContext>().GetConfigurationPackageObject("config")));
             //container.RegisterType<IServiceScopeFactory, UnityServiceScopeFactory>(new HierarchicalLifetimeManager());
             //container.RegisterType<IServiceScope, UnityServiceScope>(new HierarchicalLifetimeManager());
             //container.RegisterType<IServiceProvider, UnityServiceProvider>(new HierarchicalLifetimeManager());
@@ -288,6 +316,7 @@ namespace SInnovations.ServiceFabric.Unity
                         actorTypeInfo: actorType,
                         actorFactory: (service, id) =>
                              container.CreateChildContainer()
+                                 .RegisterInstance(service.Context.CodePackageActivationContext)
                                  .RegisterInstance(service, new ContainerControlledLifetimeManager())
                                  .RegisterInstance(id, new ContainerControlledLifetimeManager()).Resolve<TActor>(),
                         settings: settings);
@@ -320,6 +349,7 @@ namespace SInnovations.ServiceFabric.Unity
         {
             var child = container.CreateChildContainer();
             child.RegisterInstance<ServiceContext>(context, new ContainerControlledLifetimeManager());
+            child.RegisterInstance(context.CodePackageActivationContext);
             child.RegisterInstance(context, new ContainerControlledLifetimeManager());
 
             return child;
