@@ -247,6 +247,24 @@ namespace SInnovations.ServiceFabric.Unity
 
     }
 
+    public static class UnityExtensions
+    {
+        public static IUnityContainer AddSingleton<T>(this IUnityContainer container)
+        {
+            return container.RegisterType<T>(new ContainerControlledLifetimeManager());
+        }
+
+        public static IUnityContainer AddScoped<TFrom, TTo>(this IUnityContainer container) where TTo : TFrom
+        {
+            return container.RegisterType<TFrom, TTo>(new HierarchicalLifetimeManager());
+        }
+
+        public static IUnityContainer AddScoped<TTo>(this IUnityContainer container, params InjectionMember[] injectionMembers)
+        {
+            return container.RegisterType<TTo>(new HierarchicalLifetimeManager(), injectionMembers);
+        }
+
+    }
     public static class UnityFabricExtensions
     {
         public static IUnityContainer AsFabricContainer(this FabricRuntime runtime)
