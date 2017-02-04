@@ -267,9 +267,15 @@ namespace SInnovations.ServiceFabric.Unity
     }
     public static class UnityFabricExtensions
     {
+        public static IUnityContainer WithExtension(this IUnityContainer contianer)
+        {
+           // contianer.AddExtension(new TypeTrackingExtension());
+
+            return contianer;
+        }
         public static IUnityContainer AsFabricContainer(this FabricRuntime runtime)
         {
-            return new UnityContainer().RegisterInstance(runtime);
+            return new UnityContainer().AsFabricContainer(c => runtime);
         }
         public static IUnityContainer ConfigureLogging(this IUnityContainer container,ILoggerFactory logger)
         {
@@ -303,16 +309,29 @@ namespace SInnovations.ServiceFabric.Unity
         {
             return container.Configure<T>(container.Resolve<IConfigurationRoot>().GetSection(sectionName));
         }
-        public static IUnityContainer AsFabricContainer(this IUnityContainer container, Func<IUnityContainer, FabricRuntime> factory)
+        private static IUnityContainer AsFabricContainerInternal(this IUnityContainer container)
         {
-            container.RegisterType<FabricRuntime>(new ContainerControlledLifetimeManager(), new InjectionFactory(factory));
+
+        
+
             container.RegisterType<ICodePackageActivationContext>(new ContainerControlledLifetimeManager(), new InjectionFactory(c => FabricRuntime.GetActivationContext()));
             container.RegisterType<ConfigurationPackage>(new ContainerControlledLifetimeManager(), new InjectionFactory((c) => c.Resolve<ICodePackageActivationContext>().GetConfigurationPackageObject("config")));
-            //container.RegisterType<IServiceScopeFactory, UnityServiceScopeFactory>(new HierarchicalLifetimeManager());
-            //container.RegisterType<IServiceScope, UnityServiceScope>(new HierarchicalLifetimeManager());
-            //container.RegisterType<IServiceProvider, UnityServiceProvider>(new HierarchicalLifetimeManager());
+            container.RegisterType<FabricClient>(new ContainerControlledLifetimeManager(), new InjectionFactory((c) => new FabricClient()));
 
-            return container.WithCoreCLR();
+            return container;
+        }
+        public static IUnityContainer AsFabricContainer(this IUnityContainer container, FabricRuntime instance)
+        {
+
+
+
+            return container.WithExtension().RegisterInstance(instance).WithCoreCLR().AsFabricContainerInternal();
+        }
+        public static IUnityContainer AsFabricContainer(this IUnityContainer container, Func<IUnityContainer, FabricRuntime> factory)
+        {
+            return container.WithExtension().RegisterType<FabricRuntime>(new ContainerControlledLifetimeManager(), new InjectionFactory(factory))
+                .WithCoreCLR().AsFabricContainerInternal();
+
         }
 
         
@@ -365,7 +384,7 @@ namespace SInnovations.ServiceFabric.Unity
 
         private static IUnityContainer MakeServiceContainer<T>(IUnityContainer container, T context) where T : ServiceContext
         {
-            var child = container.CreateChildContainer();
+            var child = container.CreateChildContainer().WithExtension();
             child.RegisterInstance<ServiceContext>(context, new ContainerControlledLifetimeManager());
             child.RegisterInstance(context.CodePackageActivationContext);
             child.RegisterInstance(context, new ContainerControlledLifetimeManager());

@@ -24,26 +24,111 @@ namespace SInnovations.ServiceFabric.Unity
             return type.GetGenericArguments();
         }
     }
-    
+
+    public class UnityWrappingServiceProvider : IServiceProvider
+    {
+        private IServiceProvider child;
+        private IUnityContainer container;
+        public UnityWrappingServiceProvider(IServiceProvider child, IUnityContainer container)
+        {
+            this.child = child;
+            this.container = container;
+        }
+        public object GetService(Type serviceType)
+        {
+            
+            if(serviceType == typeof(IServiceScopeFactory) || serviceType == typeof(IServiceScope))
+            {
+                return TryGet(serviceType);
+            }else if(serviceType == typeof(IUnityContainer))
+            {
+                return this.container;
+            }
+
+            return child.GetService(serviceType) ?? TryGet(serviceType);
+        }
+
+        private object TryGet(Type serviceType)
+        {
+            try
+            {
+                return container.Resolve(serviceType);
+            }catch(Exception ex)
+            {
+                return null;
+            }
+        }
+    }
+    public class scopeFactory : IServiceScopeFactory
+    {
+        private IServiceProvider child;
+        private IUnityContainer container;
+        public scopeFactory(IUnityContainer container)
+        {
+            this.container = container;
+            child = this.container.Resolve<IServiceProvider>("old");
+        }
+        public IServiceScope CreateScope()
+        {
+            
+            return new scopewrap(this.container, child.CreateScope());
+        }
+    }
+
+    public class scopewrap : IServiceScope
+    {
+        private IUnityContainer container;
+       
+
+        public scopewrap(IUnityContainer container, IServiceScope aspNetScope)
+        {
+            this.container = container.CreateChildContainer();
+            this.container.RegisterInstance("old", aspNetScope);
+            this.container.RegisterInstance<IServiceProvider>("old", aspNetScope.ServiceProvider);
+           
+
+        }
+        public IServiceProvider ServiceProvider => this.container.Resolve<IServiceProvider>();
+
+        public void Dispose()
+        {
+            this.container.Dispose();
+            
+        }
+    }
 
     public static class UnityGlueConfiguration
     {
-        public static void Register(IServiceCollection services, IUnityContainer container)
+        public static IServiceProvider GetServiceFabricServiceProvider(this IServiceCollection services)
         {
+            var org = services.BuildServiceProvider();
+            var container = org.GetService<IUnityContainer>();
+           // Register(services, container);
+            container.RegisterInstance("old", org);
+
+
+          
+            return container.Resolve<IServiceProvider>();
+        }
+        //public static void Register(IServiceCollection services, IUnityContainer container)
+        //{
           
 
-            HashSet<Type> aggregateTypes = GetAggregateTypes(services);
-            MethodInfo miRegisterInstanceOpen = RegisterInstance();
-            Func<ServiceDescriptor, LifetimeManager> lifetime = GetLifetime();
-            foreach (ServiceDescriptor service in services)
-                RegisterType(container, lifetime, service, aggregateTypes, miRegisterInstanceOpen);
-        }
+        //    HashSet<Type> aggregateTypes = GetAggregateTypes(services);
+        //    MethodInfo miRegisterInstanceOpen = RegisterInstance();
+        //    Func<ServiceDescriptor, LifetimeManager> lifetime = GetLifetime();
+        //    foreach (ServiceDescriptor service in services)
+        //        RegisterType(container, lifetime, service, aggregateTypes, miRegisterInstanceOpen);
+        //}
 
         public static IUnityContainer WithCoreCLR(this IUnityContainer container)
         {
-            container.RegisterType<IServiceScopeFactory, ServiceScopeFactory>();
-            container.RegisterType<IServiceScope, ServiceScope>();
-            container.RegisterType<IServiceProvider, ServiceProvider>();
+            container.RegisterType<IServiceProvider>(new HierarchicalLifetimeManager(), new InjectionFactory(c => new UnityWrappingServiceProvider(c.Resolve<IServiceProvider>("old"), c)));
+            container.RegisterType<IServiceScopeFactory, scopeFactory>(new HierarchicalLifetimeManager());
+
+            // container.RegisterType<IServiceScopeFactory, ServiceScopeFactory>();
+            // container.RegisterType<IServiceScope, ServiceScope>();
+            //container.RegisterType<IServiceProvider, ServiceProvider>();
 
             RegisterEnumerable(container);
             return container;

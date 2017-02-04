@@ -17,6 +17,7 @@ namespace SInnovations.ServiceFabric.Unity
         public ServiceScope(IUnityContainer container)
         {
             this.container = container.CreateChildContainer();
+            this.container.WithExtension();
             this.serviceProvider = this.container.Resolve<IServiceProvider>();
         }
 
