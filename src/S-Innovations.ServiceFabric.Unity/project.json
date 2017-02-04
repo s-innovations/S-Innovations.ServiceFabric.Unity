@@ -2,14 +2,13 @@
   "version": "1.0.0-*",
 
   "dependencies": {
-    "Microsoft.AspNetCore.Mvc.Core": "1.1.0",
     "Microsoft.Extensions.Configuration.Abstractions": "1.1.0",
-    "Microsoft.Extensions.DependencyInjection": "1.0.0",
-    "Microsoft.Extensions.Logging": "1.0.0",
+    "Microsoft.Extensions.DependencyInjection": "1.1.0",
+    "Microsoft.Extensions.Logging": "1.1.0",
     "Microsoft.Extensions.Options": "1.1.0",
     "Microsoft.Extensions.Options.ConfigurationExtensions": "1.1.0",
-    "Microsoft.ServiceFabric.Actors": "2.4.145",
-    "Microsoft.ServiceFabric.Services": "2.4.145",
+    "Microsoft.ServiceFabric.Actors": "2.4.164",
+    "Microsoft.ServiceFabric.Services": "2.4.164",
     "Unity": "4.0.1"
   },
 
