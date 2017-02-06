@@ -385,9 +385,9 @@ namespace SInnovations.ServiceFabric.Unity
         private static IUnityContainer MakeServiceContainer<T>(IUnityContainer container, T context) where T : ServiceContext
         {
             var child = container.CreateChildContainer().WithExtension();
-            child.RegisterInstance<ServiceContext>(context, new ContainerControlledLifetimeManager());
-            child.RegisterInstance(context.CodePackageActivationContext);
-            child.RegisterInstance(context, new ContainerControlledLifetimeManager());
+            child.RegisterInstance<ServiceContext>(context, new ExternallyControlledLifetimeManager());
+            child.RegisterInstance(context.CodePackageActivationContext,new ExternallyControlledLifetimeManager());
+            child.RegisterInstance(context, new ExternallyControlledLifetimeManager());
 
             return child;
         }
