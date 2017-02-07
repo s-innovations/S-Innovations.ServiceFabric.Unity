@@ -353,8 +353,8 @@ namespace SInnovations.ServiceFabric.Unity
                         actorTypeInfo: actorType,
                         actorFactory: (service, id) =>
                              container.CreateChildContainer()
-                                 .RegisterInstance(service.Context.CodePackageActivationContext)
-                                 .RegisterInstance(service, new ContainerControlledLifetimeManager())
+                                 .RegisterInstance(service.Context.CodePackageActivationContext, new ExternallyControlledLifetimeManager())
+                                 .RegisterInstance(service, new ExternallyControlledLifetimeManager())
                                  .RegisterInstance(id, new ContainerControlledLifetimeManager()).Resolve<TActor>(),
                         settings: settings);
                 }
