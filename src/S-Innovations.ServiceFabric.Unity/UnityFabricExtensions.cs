@@ -371,23 +371,39 @@ namespace SInnovations.ServiceFabric.Unity
             return container;
         }
 
-        public static IUnityContainer WithStatelessService<TStatelessService>(this IUnityContainer container, string serviceTypeName, TimeSpan timeout=default(TimeSpan), CancellationToken cancellationToken = default(CancellationToken)) where TStatelessService : StatelessService
+        //public static IUnityContainer WithStatelessService<TStatelessService>(this IUnityContainer container, string serviceTypeName, TimeSpan timeout=default(TimeSpan), CancellationToken cancellationToken = default(CancellationToken)) where TStatelessService : StatelessService
+        //{
+        //    ServiceRuntime.RegisterServiceAsync(serviceTypeName, (context) => MakeServiceContainer(container, context).Resolve<TStatelessService>(), timeout, cancellationToken).GetAwaiter().GetResult();
+        //    return container;
+        //}
+        //public static IUnityContainer WithStatefullService<TStatelessService>(this IUnityContainer container, string serviceTypeName, TimeSpan timeout = default(TimeSpan), CancellationToken cancellationToken = default(CancellationToken)) where TStatelessService : StatefulService
+        //{
+        //    ServiceRuntime.RegisterServiceAsync(serviceTypeName, (context) => MakeServiceContainer(container, context).Resolve<TStatelessService>(), timeout, cancellationToken).GetAwaiter().GetResult();
+        //    return container;
+        //}
+
+        public static IUnityContainer WithStatelessService<TStatelessService>(this IUnityContainer container, string serviceTypeName, Action<IUnityContainer> scopedRegistrations = null, TimeSpan timeout = default(TimeSpan), CancellationToken cancellationToken = default(CancellationToken)) where TStatelessService : StatelessService
         {
-            ServiceRuntime.RegisterServiceAsync(serviceTypeName, (context) => MakeServiceContainer(container, context).Resolve<TStatelessService>(), timeout, cancellationToken).GetAwaiter().GetResult();
+            ServiceRuntime.RegisterServiceAsync(serviceTypeName, (context) => MakeServiceContainer(container, context, scopedRegistrations).Resolve<TStatelessService>(), timeout, cancellationToken).GetAwaiter().GetResult();
             return container;
         }
-        public static IUnityContainer WithStatefullService<TStatelessService>(this IUnityContainer container, string serviceTypeName, TimeSpan timeout = default(TimeSpan), CancellationToken cancellationToken = default(CancellationToken)) where TStatelessService : StatefulService
+        public static IUnityContainer WithStatefullService<TStatelessService>(this IUnityContainer container, string serviceTypeName, Action<IUnityContainer> scopedRegistrations = null, TimeSpan timeout = default(TimeSpan), CancellationToken cancellationToken = default(CancellationToken)) where TStatelessService : StatefulService
         {
-            ServiceRuntime.RegisterServiceAsync(serviceTypeName, (context) => MakeServiceContainer(container, context).Resolve<TStatelessService>(), timeout, cancellationToken).GetAwaiter().GetResult();
+            ServiceRuntime.RegisterServiceAsync(serviceTypeName, (context) => MakeServiceContainer(container, context, scopedRegistrations).Resolve<TStatelessService>(), timeout, cancellationToken).GetAwaiter().GetResult();
             return container;
         }
 
-        private static IUnityContainer MakeServiceContainer<T>(IUnityContainer container, T context) where T : ServiceContext
+
+        private static IUnityContainer MakeServiceContainer<T>(IUnityContainer container, T context, Action<IUnityContainer> scopeRegistrations=null) where T : ServiceContext
         {
+            
             var child = container.CreateChildContainer().WithExtension();
+          
             child.RegisterInstance<ServiceContext>(context, new ExternallyControlledLifetimeManager());
             child.RegisterInstance(context.CodePackageActivationContext,new ExternallyControlledLifetimeManager());
             child.RegisterInstance(context, new ExternallyControlledLifetimeManager());
+
+            scopeRegistrations?.Invoke(child);
 
             return child;
         }
