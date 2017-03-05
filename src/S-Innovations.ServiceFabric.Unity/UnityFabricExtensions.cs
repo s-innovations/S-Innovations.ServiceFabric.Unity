@@ -344,7 +344,7 @@ namespace SInnovations.ServiceFabric.Unity
 
         public static IUnityContainer WithActor<TActor,TActorService>(
             this IUnityContainer container, 
-            Func<StatefulServiceContext, ActorTypeInformation,Func<TActorService,ActorId, TActor>,TActorService> ActorServiceFactory)
+            Func<StatefulServiceContext, ActorTypeInformation,Func<ActorService,ActorId, TActor>,TActorService> ActorServiceFactory)
             where TActor : ActorBase
             where TActorService : ActorService
         {
