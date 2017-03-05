@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Practices.Unity;
+using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 
@@ -333,9 +334,19 @@ namespace SInnovations.ServiceFabric.Unity
                 .WithCoreCLR().AsFabricContainerInternal();
 
         }
-
-        
         public static IUnityContainer WithActor<TActor>(this IUnityContainer container, ActorServiceSettings settings = null) where TActor : ActorBase
+        {
+            return container.WithActor<TActor, ActorService>(
+                (context,actorType,actorFactory) =>
+                    new ActorService(context, actorTypeInfo: actorType, actorFactory: actorFactory, settings: settings));
+        }
+
+
+        public static IUnityContainer WithActor<TActor,TActorService>(
+            this IUnityContainer container, 
+            Func<StatefulServiceContext, ActorTypeInformation,Func<TActorService,ActorId, TActor>,TActorService> ActorServiceFactory)
+            where TActor : ActorBase
+            where TActorService : ActorService
         {
             var logger = container.Resolve<ILoggerFactory>().CreateLogger<TActor>();
             logger.LogInformation("Registering Actor {ActorName}", typeof(TActor).Name);
@@ -349,14 +360,11 @@ namespace SInnovations.ServiceFabric.Unity
             ActorRuntime.RegisterActorAsync<TActor>((context, actorType) => {
                 try
                 {
-                    return new ActorService(context,
-                        actorTypeInfo: actorType,
-                        actorFactory: (service, id) =>
-                             container.CreateChildContainer()
-                                 .RegisterInstance(service.Context.CodePackageActivationContext, new ExternallyControlledLifetimeManager())
-                                 .RegisterInstance(service, new ExternallyControlledLifetimeManager())
-                                 .RegisterInstance(id, new ContainerControlledLifetimeManager()).Resolve<TActor>(),
-                        settings: settings);
+                    return ActorServiceFactory(context, actorType, (service, id) =>
+                               container.CreateChildContainer()
+                                   .RegisterInstance(service.Context.CodePackageActivationContext, new ExternallyControlledLifetimeManager())
+                                   .RegisterInstance(service, new ExternallyControlledLifetimeManager())
+                                   .RegisterInstance(id, new ContainerControlledLifetimeManager()).Resolve<TActor>());
                 }
                 catch (Exception ex)
                 {
