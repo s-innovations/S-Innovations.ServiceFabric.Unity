@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Fabric;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.PlatformAbstractions;
 using Microsoft.Practices.Unity;
 using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Runtime;
@@ -282,6 +286,24 @@ namespace SInnovations.ServiceFabric.Unity
         {
             return container.RegisterInstance(logger);
         }
+
+        public static IUnityContainer UseConfiguration(this IUnityContainer container, IConfiguration config, string contentRoot = null)
+        {
+           
+            var _options = new WebHostOptions(config);
+            var appEnvironment = PlatformServices.Default.Application;
+
+            var applicationName = _options.ApplicationName ?? appEnvironment.ApplicationName;
+
+            var environment = new HostingEnvironment();
+            environment.Initialize(applicationName, contentRoot?? Directory.GetCurrentDirectory(), _options);
+
+            container.RegisterInstance<IHostingEnvironment>(environment);
+            container.RegisterInstance(config);
+
+            return container;
+        }
+
         public static IUnityContainer AsFabricContainer(this IUnityContainer container)
         {
             return container.AsFabricContainer(c => FabricRuntime.Create());
