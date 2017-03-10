@@ -314,12 +314,14 @@ namespace SInnovations.ServiceFabric.Unity
         }
         public static IUnityContainer BuildConfiguration(this IUnityContainer container, IConfigurationBuilder builder)
         {
-           return container.RegisterInstance(builder.Build());
+            return container.UseConfiguration(builder.Build());
+         //  return container.RegisterInstance(builder.Build());
         }
         public static IConfigurationRoot Build(this IConfigurationBuilder builder, IUnityContainer container)
         {
-            var a = builder.Build();
+            var a = builder.Build();           
             container.RegisterInstance(a);
+            container.UseConfiguration(a);
             return a;
         }
         public static IUnityContainer Configure<T>(this IUnityContainer container, IConfigurationSection configuration) where T : class
