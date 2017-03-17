@@ -57,6 +57,9 @@ namespace SInnovations.ServiceFabric.Unity
                 return EnumerableExtension.ConcatMethod.MakeGenericMethod(serviceType.GenericTypeArguments).Invoke(null,new [] { orignal.GetService(serviceType), TryGet(serviceType) });
             }
 
+            if (container.IsRegistered(serviceType))
+                return TryGet(serviceType) ?? orignal.GetService(serviceType);
+
             return orignal.GetService(serviceType) ?? TryGet(serviceType);
         }
 
