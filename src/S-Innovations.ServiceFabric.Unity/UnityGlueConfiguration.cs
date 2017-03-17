@@ -24,14 +24,23 @@ namespace SInnovations.ServiceFabric.Unity
             return type.GetGenericArguments();
         }
     }
+    public static class EnumerableExtension
+    {
+        public static MethodInfo ConcatMethod = typeof(EnumerableExtension).GetMethod("Concat", BindingFlags.Public | BindingFlags.Static);
+        public static IEnumerable<T> Concat<T>(IEnumerable<T> first, IEnumerable<T> last)
+        {
+            return first.Concat(last);
+        }
+         
+    }
 
     public class UnityWrappingServiceProvider : IServiceProvider
     {
-        private IServiceProvider child;
+        private IServiceProvider orignal;
         private IUnityContainer container;
-        public UnityWrappingServiceProvider(IServiceProvider child, IUnityContainer container)
+        public UnityWrappingServiceProvider(IServiceProvider original, IUnityContainer container)
         {
-            this.child = child;
+            this.orignal = original;
             this.container = container;
         }
         public object GetService(Type serviceType)
@@ -43,11 +52,15 @@ namespace SInnovations.ServiceFabric.Unity
             }else if(serviceType == typeof(IUnityContainer))
             {
                 return this.container;
+            }else if(serviceType.IsGenericType && serviceType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+            {
+                return EnumerableExtension.ConcatMethod.MakeGenericMethod(serviceType.GenericTypeArguments).Invoke(null,new [] { orignal.GetService(serviceType), TryGet(serviceType) });
             }
 
-            return child.GetService(serviceType) ?? TryGet(serviceType);
+            return orignal.GetService(serviceType) ?? TryGet(serviceType);
         }
 
+        
         private object TryGet(Type serviceType)
         {
             try
@@ -101,14 +114,14 @@ namespace SInnovations.ServiceFabric.Unity
     {
         public static IServiceProvider GetServiceFabricServiceProvider(this IServiceCollection services)
         {
-            var org = services.BuildServiceProvider();
-            var container = org.GetService<IUnityContainer>();
-           // Register(services, container);
-            container.RegisterInstance("old", org);
+            var aspNetServiceProvider = services.BuildServiceProvider();
+            var serviceFabricContainer = aspNetServiceProvider.GetService<IUnityContainer>();
+ 
+            serviceFabricContainer.RegisterInstance("old", aspNetServiceProvider);
 
 
           
-            return container.Resolve<IServiceProvider>();
+            return serviceFabricContainer.Resolve<IServiceProvider>();
         }
         //public static void Register(IServiceCollection services, IUnityContainer container)
         //{

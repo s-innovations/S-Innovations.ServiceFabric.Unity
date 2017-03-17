@@ -286,6 +286,7 @@ namespace SInnovations.ServiceFabric.Unity
         {
             return container.RegisterInstance(logger);
         }
+         
 
         public static IUnityContainer UseConfiguration(this IUnityContainer container, IConfiguration config, string contentRoot = null)
         {
