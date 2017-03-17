@@ -18,7 +18,13 @@ namespace SInnovations.ServiceFabric.Unity
 
         public object GetService(Type serviceType)
         {
-            return container.Resolve(serviceType);
+            
+            if (container.IsRegistered(serviceType))
+            {
+                return container.Resolve(serviceType);
+            }
+
+            return null;
         }
     }
 }
