@@ -24,15 +24,15 @@ namespace SInnovations.ServiceFabric.Unity
             return type.GetGenericArguments();
         }
     }
-    public static class EnumerableExtension
-    {
-        public static MethodInfo ConcatMethod = typeof(EnumerableExtension).GetMethod("Concat", BindingFlags.Public | BindingFlags.Static);
-        public static IEnumerable<T> Concat<T>(IEnumerable<T> first, IEnumerable<T> last)
-        {
-            return first.Concat(last);
-        }
+    //public static class EnumerableExtension
+    //{
+    //    public static MethodInfo ConcatMethod = typeof(EnumerableExtension).GetMethod("Concat", BindingFlags.Public | BindingFlags.Static);
+    //    public static IEnumerable<T> Concat<T>(IEnumerable<T> first, IEnumerable<T> last)
+    //    {
+    //        return first.Concat(last);
+    //    }
          
-    }
+    //}
 
     public class UnityWrappingServiceProvider : IServiceProvider
     {
@@ -48,35 +48,36 @@ namespace SInnovations.ServiceFabric.Unity
             
             if(serviceType == typeof(IServiceScopeFactory) || serviceType == typeof(IServiceScope))
             {
-                return TryGet(serviceType);
+                return container.Resolve(serviceType); // TryGet(serviceType);
             }else if(serviceType == typeof(IUnityContainer))
             {
                 return this.container;
-            }else if(serviceType.IsGenericType && serviceType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-            {
-                return EnumerableExtension.ConcatMethod.MakeGenericMethod(serviceType.GenericTypeArguments).Invoke(null,new [] { orignal.GetService(serviceType), TryGet(serviceType) });
             }
+            //else if(serviceType.IsGenericType && serviceType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+            //{
+            //    return EnumerableExtension.ConcatMethod.MakeGenericMethod(serviceType.GenericTypeArguments).Invoke(null,new [] { orignal.GetService(serviceType), TryGet(serviceType) });
+            //}
 
-            if (container.IsRegistered(serviceType) ||
-                (serviceType.IsGenericType && serviceType.GenericTypeArguments.All(t => container.IsRegistered(t))))
-            {
-                return TryGet(serviceType) ?? orignal.GetService(serviceType);
-            }
+            //if (container.IsRegistered(serviceType) ||
+            //    (serviceType.IsGenericType && serviceType.GenericTypeArguments.All(t => container.IsRegistered(t))))
+            //{
+            //    return TryGet(serviceType) ?? orignal.GetService(serviceType);
+            //}
 
-            return orignal.GetService(serviceType) ?? TryGet(serviceType);
+            return orignal.GetService(serviceType); // ?? TryGet(serviceType);
         }
 
         
-        private object TryGet(Type serviceType)
-        {
-            try
-            {
-                return container.Resolve(serviceType);
-            }catch(Exception ex)
-            {
-                return null;
-            }
-        }
+        //private object TryGet(Type serviceType)
+        //{
+        //    try
+        //    {
+        //        return container.Resolve(serviceType);
+        //    }catch(Exception ex)
+        //    {
+        //        return null;
+        //    }
+        //}
     }
     public class scopeFactory : IServiceScopeFactory
     {
@@ -118,6 +119,17 @@ namespace SInnovations.ServiceFabric.Unity
 
     public static class UnityGlueConfiguration
     {
+        public static IServiceProvider GetServiceFabricServiceProvider2(this IServiceCollection services)
+        {
+            var aspNetServiceProvider = services.BuildServiceProvider();
+            var serviceFabricContainer = aspNetServiceProvider.GetService<IUnityContainer>();
+
+            serviceFabricContainer.RegisterInstance("old", aspNetServiceProvider);
+
+
+
+            return serviceFabricContainer.Resolve<IServiceProvider>();
+        }
         public static IServiceProvider GetServiceFabricServiceProvider(this IServiceCollection services)
         {
             var aspNetServiceProvider = services.BuildServiceProvider();
@@ -149,7 +161,7 @@ namespace SInnovations.ServiceFabric.Unity
             // container.RegisterType<IServiceScope, ServiceScope>();
             //container.RegisterType<IServiceProvider, ServiceProvider>();
 
-            RegisterEnumerable(container);
+        //    RegisterEnumerable(container);
             return container;
         }
 
