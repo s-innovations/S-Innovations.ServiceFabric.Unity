@@ -43,7 +43,7 @@ namespace SInnovations.ServiceFabric.Unity
                     }
                     else
                     {
-                        services.AddTransient(registration.RegisteredType, (sp) => sp.GetService<IUnityContainer>().Resolve(registration.MappedToType, registration.Name));
+                        services.AddTransient(registration.RegisteredType, (sp) => sp.GetService<IUnityContainer>().Resolve(registration.RegisteredType, registration.Name));
                     }
                 }catch(Exception ex)
                 {
