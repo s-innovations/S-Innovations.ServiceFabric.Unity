@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Practices.Unity;
 using System.Reflection;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace SInnovations.ServiceFabric.Unity
 {
@@ -19,6 +20,8 @@ namespace SInnovations.ServiceFabric.Unity
 
             container.RegisterType<IServiceProvider, UnityServiceProvider>();
             container.RegisterType<IServiceScopeFactory, UnityServiceScopeFactory>();
+
+            
 
             foreach (var descriptor in descriptors)
             {
@@ -70,10 +73,15 @@ namespace SInnovations.ServiceFabric.Unity
                     }
                     else
                     {
-                        throw new Exception($"Multiple constructors of type {descriptor.ServiceType.Name} is not supported: {string.Join(",", parameters.Select(p=>$"{p.Name} : {p.ParameterType.Name}"))}");
-                        //container.RegisterType(descriptor.ServiceType,
-                        //     descriptor.ImplementationType,name,
-                        //     liftime);
+                        if (container.IsRegistered<ILoggerFactory>())
+                        {
+                           container.Resolve<ILoggerFactory>().CreateLogger("UnityRegistration").LogError(
+                               $"Multiple constructors of type {descriptor.ServiceType.Name}=>{descriptor.ImplementationType.Name} is not supported:" +
+                               $" {string.Join(",", parameters.Select(p => $"{p.Name} : {p.ParameterType.Name}"))}");
+                        }
+                        container.RegisterType(descriptor.ServiceType,
+                             descriptor.ImplementationType, name,
+                             liftime);
                     }
                     
                 }
