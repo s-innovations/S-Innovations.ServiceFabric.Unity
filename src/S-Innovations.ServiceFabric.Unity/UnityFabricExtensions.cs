@@ -83,6 +83,10 @@ namespace SInnovations.ServiceFabric.Unity
 
             container.RegisterInstance<IHostingEnvironment>(environment);
             container.RegisterInstance(config);
+            if(config is IConfigurationRoot)
+            {
+                container.RegisterInstance(config as IConfigurationRoot);
+            }
 
             return container;
         }
