@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net452</TargetFramework>
+    <AssemblyName>DotNetCoreActorExample</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <PackageId>DotNetCoreActorExample</PackageId>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\S-Innovations.ServiceFabric.Unity\S-Innovations.ServiceFabric.Unity.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="1.1.1" />
+    <PackageReference Include="Serilog.Sinks.Trace" Version="2.1.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="1.3.1" />
+    <PackageReference Include="Unity" Version="4.0.1" />
+    <PackageReference Include="Microsoft.ServiceFabric" Version="5.4.164" />
+    <PackageReference Include="Microsoft.ServiceFabric.Data" Version="2.4.164" />
+    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="2.4.164" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="2.4.164" />
+  </ItemGroup>
+
+  <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">
+    <Exec Command="cmd /c copy ..\..\packages\Microsoft.ServiceFabric.Actors.2.2.207\build\FabActUtil.exe .\bin\Debug\net452\win7-x64\FabActUtil.exe" />
+    <Exec Command=".\bin\Debug\net452\win7-x64\FabActUtil.exe /spp:PackageRoot /t:manifest /sp:DotNetCoreActorExample /in:.\bin\Debug\net452\win7-x64\DotNetCoreActorExample.exe" />
+    <Exec Command="cmd /c del .\bin\Debug\net452\win7-x64\FabActUtil.exe" />
+  </Target>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
+    <PackageReference Remove="Microsoft.ServiceFabric;Microsoft.ServiceFabric.Data;Microsoft.ServiceFabric.Services;Microsoft.ServiceFabric.Actors" />
+    <PackageReference Include="Microsoft.ServiceFabric" Version="5.2.207" />
+    <PackageReference Include="Microsoft.ServiceFabric.Data" Version="2.2.207" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="2.2.207" />
+    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="2.2.207" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+</Project>

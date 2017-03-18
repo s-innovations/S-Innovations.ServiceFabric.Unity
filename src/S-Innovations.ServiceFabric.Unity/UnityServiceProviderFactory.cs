@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Practices.Unity;
+using Microsoft.AspNetCore.Hosting;
 
 namespace SInnovations.ServiceFabric.Unity
 {
@@ -45,9 +46,8 @@ namespace SInnovations.ServiceFabric.Unity
 
         public IServiceProvider CreateServiceProvider(IServiceCollection containerBuilder)
         {
-            UnityRegistration.Populate(root, containerBuilder);
-            return root.Resolve<IServiceProvider>();
-          //  return containerBuilder.GetServiceFabricServiceProvider();
+            return root.Populate(containerBuilder).Resolve<IServiceProvider>();           
+         
         }
     }
 }

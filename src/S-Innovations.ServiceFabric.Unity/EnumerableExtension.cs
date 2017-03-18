@@ -15,6 +15,7 @@ namespace SInnovations.ServiceFabric.Unity
             // Enumerable strategy
             Context.Strategies.AddNew<EnumerableResolutionStrategy>(
                 UnityBuildStage.TypeMapping);
+            
         }
     }
 }

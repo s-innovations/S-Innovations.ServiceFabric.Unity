@@ -18,12 +18,21 @@ namespace SInnovations.ServiceFabric.Unity
 
         public object GetService(Type serviceType)
         {
-            
-            if (container.IsRegistered(serviceType))
+            if (serviceType.IsGenericType && serviceType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
             {
                 return container.Resolve(serviceType);
             }
 
+            if(serviceType.IsGenericType && container.IsRegistered(serviceType.GetGenericTypeDefinition()))
+            {
+                return container.Resolve(serviceType);
+            }
+
+            if (container.IsRegistered(serviceType))
+            {             
+                return container.Resolve(serviceType);
+            }
+            
             return null;
         }
     }

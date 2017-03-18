@@ -92,7 +92,8 @@ namespace SInnovations.ServiceFabric.Unity
 
             if (type.IsGenericType)
             {
-                names = names.Concat(GetRegisteredNames(container, type.GetGenericTypeDefinition()));
+                var childType = type.GetGenericTypeDefinition();
+                names = names.Concat(GetRegisteredNames(container, childType));
             }
 
             return names.Distinct()

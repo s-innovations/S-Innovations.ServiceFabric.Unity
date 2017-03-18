@@ -4,65 +4,118 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Practices.Unity;
+using System.Reflection;
+using Microsoft.AspNetCore.Http;
 
 namespace SInnovations.ServiceFabric.Unity
 {
-   public static class UnityRegistration  
-{
-    public static void Populate(this IUnityContainer container, 
-        IEnumerable<ServiceDescriptor> descriptors)
+    public static class UnityRegistration
     {
-        container.AddExtension(new EnumerableExtension());
+        public static IUnityContainer Populate(this IUnityContainer container,
+            IEnumerable<ServiceDescriptor> descriptors)
+        {
+            container.WithExtension();
+            // container.AddExtension(new EnumerableExtension());
+
+            container.RegisterType<IServiceProvider, UnityServiceProvider>();
+            container.RegisterType<IServiceScopeFactory, UnityServiceScopeFactory>();
+
+            foreach (var descriptor in descriptors)
+            {
+                Register(container, descriptor);
+            }
+            return container;
+        }
+
+        private static void Register(IUnityContainer container,
+            ServiceDescriptor descriptor)
+        {
+            var name = null as string;
             
-        container.RegisterType<IServiceProvider, UnityServiceProvider>();
-        container.RegisterType<IServiceScopeFactory, UnityServiceScopeFactory>();
 
-        foreach (var descriptor in descriptors)
-        {
-            Register(container, descriptor);
-        }
-    }
-
-    private static void Register(IUnityContainer container,
-        ServiceDescriptor descriptor)
-    {
-        if (descriptor.ImplementationType != null)
-        {
-            container.RegisterType(descriptor.ServiceType, 
-                descriptor.ImplementationType, 
-                GetLifetimeManager(descriptor.Lifetime));
-        }
-        else if (descriptor.ImplementationFactory != null)
-        {
-            container.RegisterType(descriptor.ServiceType, 
-                GetLifetimeManager(descriptor.Lifetime),
-                new InjectionFactory(unity =>
+            if (descriptor.ImplementationType != null)
+            {
+                if (container.IsRegistered(descriptor.ServiceType))
                 {
-                    var provider = unity.Resolve<IServiceProvider>();
-                    return descriptor.ImplementationFactory(provider);
-                }));
-        }
-        else if (descriptor.ImplementationInstance != null)
-        {
-            container.RegisterInstance(descriptor.ServiceType, 
-                descriptor.ImplementationInstance, 
-                GetLifetimeManager(descriptor.Lifetime));
-        }
-    }
+                    name = descriptor.ImplementationType.AssemblyQualifiedName;
+                }
 
-    private static LifetimeManager GetLifetimeManager(ServiceLifetime lifecycle)
-    {
-        switch (lifecycle)
+                var constructors = descriptor.ImplementationType.GetTypeInfo()
+                   .DeclaredConstructors
+                   .Where(constructor => constructor.IsPublic)
+                   .ToArray();
+
+                var liftime = GetLifetimeManager(descriptor.Lifetime);
+                if (constructors.Length == 1)
+                {
+                    container.RegisterType(descriptor.ServiceType,
+                       descriptor.ImplementationType,name,
+                       liftime);
+                }
+                else
+                {
+                    var ctor = constructors.OrderByDescending(b => b.GetParameters().Length).FirstOrDefault();
+                    var parameters = ctor.GetParameters();
+
+                    if (descriptor.ServiceType == typeof(IHttpContextFactory))
+                    {
+                        container.RegisterType(descriptor.ServiceType,
+                          descriptor.ImplementationType,name,
+                          liftime, new InjectionConstructor(new ResolvedParameter(parameters[0].ParameterType), new ResolvedParameter(parameters[1].ParameterType), new OptionalParameter(parameters[2].ParameterType)));
+                    }
+                    else
+                    {
+                        throw new Exception($"Multiple constructors of type {descriptor.ServiceType.Name} is not supported: {string.Join(",", parameters.Select(p=>$"{p.Name} : {p.ParameterType.Name}"))}");
+                        //container.RegisterType(descriptor.ServiceType,
+                        //     descriptor.ImplementationType,name,
+                        //     liftime);
+                    }
+                    
+                }
+
+
+            }
+            else if (descriptor.ImplementationFactory != null)
+            {
+                if (container.IsRegistered(descriptor.ServiceType))
+                {
+                    name = Guid.NewGuid().ToString("N");
+                }
+
+                container.RegisterType(descriptor.ServiceType,name,
+                    GetLifetimeManager(descriptor.Lifetime),
+                    new InjectionFactory(unity =>
+                    {
+                        var provider = unity.Resolve<IServiceProvider>();
+                        return descriptor.ImplementationFactory(provider);
+                    }));
+            }
+            else if (descriptor.ImplementationInstance != null)
+            {
+                if (container.IsRegistered(descriptor.ServiceType))
+                {
+                    name = descriptor.ImplementationInstance.GetType().AssemblyQualifiedName;
+                }
+
+                container.RegisterInstance(descriptor.ServiceType,name,
+                    descriptor.ImplementationInstance,
+                    GetLifetimeManager(descriptor.Lifetime));
+            }
+        }
+
+        private static LifetimeManager GetLifetimeManager(ServiceLifetime lifecycle)
         {
-            case ServiceLifetime.Singleton:
-                return new ContainerControlledLifetimeManager();
-            case ServiceLifetime.Scoped:
-                return new HierarchicalLifetimeManager();
-            case ServiceLifetime.Transient:
-                return new TransientLifetimeManager();
-            default:
-                throw new NotSupportedException(lifecycle.ToString());
+            switch (lifecycle)
+            {
+                case ServiceLifetime.Singleton:
+                    return new ContainerControlledLifetimeManager();
+                case ServiceLifetime.Scoped:
+                    return new HierarchicalLifetimeManager();
+                case ServiceLifetime.Transient:
+                    return new TransientLifetimeManager();
+                default:
+                    throw new NotSupportedException(lifecycle.ToString());
+            }
         }
     }
-}
 }

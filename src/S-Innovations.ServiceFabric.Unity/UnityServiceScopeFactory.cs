@@ -24,9 +24,8 @@ namespace SInnovations.ServiceFabric.Unity
 
         private IUnityContainer CreateChildContainer()
         {
-            var child = container.CreateChildContainer();
-            child.AddExtension(new EnumerableExtension());
-            return child;
+            return container.CreateChildContainer()
+                .WithExtension(); 
         }
     }
 }
