@@ -46,7 +46,7 @@ namespace SInnovations.ServiceFabric.Unity
                    .ToArray();
 
                 var liftime = GetLifetimeManager(descriptor.Lifetime);
-                if (constructors.Length == 1)
+                if (constructors.Length == 0 || constructors.Length == 1)
                 {
                     container.RegisterType(descriptor.ServiceType,
                        descriptor.ImplementationType,name,
@@ -56,6 +56,9 @@ namespace SInnovations.ServiceFabric.Unity
                 {
 
                     //TODO, fiure out how to do this in unity extensions to build up and select proper constructor
+                    //http://stackoverflow.com/questions/36548595/how-di-container-knows-what-constructors-need-asp-net-core
+
+
                     var ctor = constructors.OrderByDescending(b => b.GetParameters().Length).FirstOrDefault();
                     var parameters = ctor.GetParameters();
 
