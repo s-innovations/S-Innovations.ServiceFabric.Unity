@@ -1,3 +1,6 @@
+[![Visual Studio Team services](https://img.shields.io/vso/build/sinnovations/40c16cc5-bf99-47d4-a814-56c38cc0ea24/23.svg?style=flat-square&label=build:%20ServiceFabric.DependencyInjection)]()
+[![Myget Version](http://img.shields.io/myget/s-innovations/vpre/S-Innovations.ServiceFabric.Unity.svg?style=flat-square&label=myget:%20ServiceFabric.DependencyInjection)](https://www.myget.org/feed/s-innovations/package/nuget/S-Innovations.ServiceFabric.Unity)
+
 # Dependency Injection Sample for Servicefabric
 
 The current sample uses Unity, but the goal is to move away from a specific container and use the CoreCLR dependency injection abstractions.
@@ -419,4 +422,84 @@ and the host service that uses a startup class.
     }
 ```
 
-### 
+### EarthML IdentityServer
+Also used in my identity server service fabric service
+
+
+```
+ public class Program
+    {
+        private const string LiterateLogTemplate = "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message}{NewLine}{Exception}{NewLine}";
+
+
+        public static void Main(string[] args)
+        {
+            var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+            var config = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{environmentName}.json", optional: true)
+                .AddEnvironmentVariables().Build();
+
+            using (var container = new UnityContainer()
+                       .AsFabricContainer().AddOptions()
+                       .UseConfiguration(config) //willl also be set on hostbuilder
+                       .ConfigureSerilogging(logConfiguration =>
+                           logConfiguration.MinimumLevel.Information()
+                           .Enrich.FromLogContext()
+                           .WriteTo.LiterateConsole(outputTemplate: LiterateLogTemplate))
+                       .ConfigureApplicationInsights())
+            {
+
+                if (args.Contains("--serviceFabric"))
+                {
+                    RunInServiceFabric(container);
+                }
+                else
+                {
+                    RunOnIIS(container);
+                }
+            }
+        }
+
+        private static void RunOnIIS(IUnityContainer container)
+        {
+            var host = new WebHostBuilder()
+                .UseKestrel()
+                .UseContentRoot(Directory.GetCurrentDirectory())                
+                .ConfigureServices(services => 
+                    services.AddSingleton(container))
+                .UseUrls("http://localhost:2069/")
+                .UseIISIntegration()
+                .UseStartup<Startup>()
+                .Build();
+
+            host.Run();
+        }
+
+        private static void RunInServiceFabric(IUnityContainer container)
+        {
+            container.WithServiceProxy<IApplicationStorageService>("fabric:/S-Innovations.ServiceFabric.GatewayApplication/ApplicationStorageService", listenerName: "RPC");
+
+            container.WithKestrelHosting<Startup>("EarthML.IdentityServiceType",
+                new KestrelHostingServiceOptions
+                {
+                    GatewayOptions = new GatewayOptions
+                    {
+                        Key = "EarthML.IdentityServiceType",
+                        ServerName = "www.earthml.com earthml.com local.earthml.com",
+                        ReverseProxyLocation = "/identity/",
+                        Ssl = new SslOptions
+                        {
+                            Enabled = true,
+                            SignerEmail = "info@earthml.com"
+                        },
+                    }
+                });
+
+            Thread.Sleep(Timeout.Infinite);
+        }
+    }
+
+```
