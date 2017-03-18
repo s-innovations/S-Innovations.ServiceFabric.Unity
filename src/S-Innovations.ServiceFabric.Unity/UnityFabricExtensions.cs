@@ -41,7 +41,7 @@ namespace SInnovations.ServiceFabric.Unity
         }
 
 
-       
+
         private class DerivedTypeConstructorSelectorPolicy : IConstructorSelectorPolicy
         {
 
@@ -57,7 +57,7 @@ namespace SInnovations.ServiceFabric.Unity
             public SelectedConstructor SelectConstructor(IBuilderContext context, IPolicyList resolverPolicyDestination)
             {
                 var originalConstructor = _originalConstructorSelectorPolicy.SelectConstructor(context, resolverPolicyDestination);
-                
+
                 if (CanResolve(originalConstructor.Constructor.GetParameters()))
                 {
                     return originalConstructor;
@@ -65,7 +65,10 @@ namespace SInnovations.ServiceFabric.Unity
                 else
                 {
                     var newSelectedConstructor = FindNewCtor(originalConstructor);
-                    foreach (var newParameterResolver in 
+                    if (newSelectedConstructor == null)
+                        return originalConstructor;
+
+                    foreach (var newParameterResolver in
                         originalConstructor.GetParameterResolvers().Take(newSelectedConstructor.Constructor.GetParameters().Length))
                     {
                         newSelectedConstructor.AddParameterResolver(newParameterResolver);
@@ -82,6 +85,7 @@ namespace SInnovations.ServiceFabric.Unity
                   .DeclaredConstructors
                   .Where(constructor => constructor.IsPublic && constructor != originalConstructor.Constructor)
                   .ToArray();
+                if (constructors.Length == 0) return null;
 
                 if (constructors.Length == 1)
                     return new SelectedConstructor(constructors[0]);
@@ -90,6 +94,10 @@ namespace SInnovations.ServiceFabric.Unity
                    (a, b) => b.GetParameters().Length.CompareTo(a.GetParameters().Length));
 
                 var newCtor = constructors.FirstOrDefault(c => CanResolve(c.GetParameters()));
+
+                if (newCtor == null)
+                    return null;
+
                 return new SelectedConstructor(newCtor);
             }
 
@@ -103,6 +111,9 @@ namespace SInnovations.ServiceFabric.Unity
             private bool CanResolve(ParameterInfo arg)
             {
                 var type = arg.ParameterType;
+                if (type.IsClass)
+                    return true;
+
                 if (type.IsGenericType)
                 {
                     var gerericType = type.GetGenericTypeDefinition();
@@ -123,16 +134,16 @@ namespace SInnovations.ServiceFabric.Unity
                 return;
             }
 
-            
+
 
             var originalSelectorPolicy = context.Policies.Get<IConstructorSelectorPolicy>(context.BuildKey,
                 out IPolicyList selectorPolicyDestination);
 
             selectorPolicyDestination.Set<IConstructorSelectorPolicy>(
                 new DerivedTypeConstructorSelectorPolicy(
-                    GetUnityFromBuildContext(context), originalSelectorPolicy), 
+                    GetUnityFromBuildContext(context), originalSelectorPolicy),
                 context.BuildKey);
-             
+
         }
 
     }
