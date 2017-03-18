@@ -35,7 +35,10 @@ Extension methods to the unity container has been made such the same methods tha
 
 ### S-Innovations Gateway
 In S-Innovations Gateway the dependency injection is used for greating a gateway application using nginx, that allows hosting of microservices on dotnet core in service fabric.
-It uses letsencrypt to automatically set up certificates and ssloffloading for backend services.
+It uses letsencrypt to automatically set up certificates and ssloffloading for backend services. 
+
+Below there is also two examples of using the gateway + dependency injection.
+
 TODO:
 - [] Insert URL
 
@@ -89,7 +92,7 @@ public class Program
     }
 ```
 
-and the host service that uses a startup class.
+and the host service that uses a startup class, but also runs some service logic.
 
 ```
  public sealed class NginxGatewayService : KestrelHostingService<Startup>
@@ -115,9 +118,7 @@ and the host service that uses a startup class.
         {
            ...
         }
-
-        #region StatelessService
-
+		  
 
         protected override void ConfigureServices(IServiceCollection services)
         {
@@ -125,242 +126,7 @@ and the host service that uses a startup class.
             base.ConfigureServices(services);
         }
 
-        private bool IsNginxRunning(){...}
-
-        private async Task WriteConfigAsync(CancellationToken token)
-        {
-            var endpoint = FabricRuntime.GetActivationContext().GetEndpoint("NginxServiceEndpoint");
-            var sslEndpoint = FabricRuntime.GetActivationContext().GetEndpoint("NginxSslServiceEndpoint");
-
-            var sb = new StringBuilder();
-
-            sb.AppendLine("worker_processes  1;");
-            sb.AppendLine("events {\n\tworker_connections  1024;\n}");
-            sb.AppendLine("http {");
-
-            File.WriteAllText("mime.types", WriteMimeTypes(sb, "mime.types").ToString());
-
-            sb.AppendLine("\tkeepalive_timeout  65;");
-            sb.AppendLine("\tgzip  on;");
-            sb.AppendLine("\tproxy_buffer_size   128k;");
-            sb.AppendLine("\tproxy_buffers   4 256k;");
-            sb.AppendLine("\tproxy_busy_buffers_size   256k;");           
-            
-            {
-                var proxies = await GetGatewayServicesAsync(token);
-
-                foreach (var serverGroup in proxies.GroupByServerName())
-                {
-                    var serverName = serverGroup.Key;
-                    var sslOn = serverName != "localhost" && serverGroup.Value.Any(k => k.Ssl.Enabled);
-
-                    if (sslOn)
-                    {
-                        var state = await GetCertGenerationStateAsync(serverName, serverGroup.Value.First().Ssl, token);
-                        sslOn = state != null && state.Completed;
-                    }
-
-
-                    sb.AppendLine("\tserver {");
-                    {
-                        sb.AppendLine($"\t\tlisten       {endpoint.Port};");
-                        if (sslOn)
-                        {
-                            sb.AppendLine($"\t\tlisten       {sslEndpoint.Port} ssl;");
-                        }
-
-                        sb.AppendLine($"\t\tserver_name  {serverName};");
-                        sb.AppendLine();
-
-                        if (sslOn)
-                        {
-
-                            var certs = storageAccount.CreateCloudBlobClient().GetContainerReference("certs");
-
-                            var certBlob = certs.GetBlockBlobReference($"{serverName}.crt");
-                            var keyBlob = certs.GetBlockBlobReference($"{serverName}.key");
-
-                            Directory.CreateDirectory(Path.Combine(Context.CodePackageActivationContext.WorkDirectory, "letsencrypt"));
-
-                            await certBlob.DownloadToFileAsync($"{Context.CodePackageActivationContext.WorkDirectory}/letsencrypt/{serverName}.crt", FileMode.Create);
-                            await keyBlob.DownloadToFileAsync($"{Context.CodePackageActivationContext.WorkDirectory}/letsencrypt/{serverName}.key", FileMode.Create);
-
-
-                            sb.AppendLine($"\t\tssl_certificate {Context.CodePackageActivationContext.WorkDirectory}/letsencrypt/{serverName}.crt;");
-                            sb.AppendLine($"\t\t ssl_certificate_key {Context.CodePackageActivationContext.WorkDirectory}/letsencrypt/{serverName}.key;");
-
-                        }
-
-
-                        foreach (var a in serverGroup.Value)
-                        {
-                            if (a.IPAddressOrFQDN == this.Context.NodeContext.IPAddressOrFQDN)
-                            {
-                                WriteProxyPassLocation(2, a.ReverseProxyLocation, a.BackendPath, sb);
-                            }
-                        }
-
-
-                    }
-                    sb.AppendLine("\t}");
-                }
-
-            }
-            sb.AppendLine("}");
-
-            File.WriteAllText("nginx.conf", sb.ToString());
-        }
-
-
-
-        private static StringBuilder WriteMimeTypes(StringBuilder sb, string name){...}
-
-        private static void WriteProxyPassLocation(int level, string location, string url, StringBuilder sb)
-        {
-
-            var tabs = string.Join("", Enumerable.Range(0, level + 1).Select(r => "\t"));
-            sb.AppendLine($"{string.Join("", Enumerable.Range(0, level).Select(r => "\t"))}location {location} {{");
-            {
-                sb.AppendLine($"{tabs}proxy_pass {url.TrimEnd('/')}/;");
-                //  sb.AppendLine($"{tabs}proxy_redirect off;");
-                sb.AppendLine($"{tabs}server_name_in_redirect on;");
-                sb.AppendLine($"{tabs}port_in_redirect off;");
-
-
-                sb.AppendLine($"{tabs}proxy_set_header Upgrade $http_upgrade;");
-                sb.AppendLine($"{tabs}proxy_set_header Connection keep-alive;");
-
-                sb.AppendLine($"{tabs}proxy_set_header Host					  $host;");
-                sb.AppendLine($"{tabs}proxy_set_header X-Real-IP              $remote_addr;");
-                sb.AppendLine($"{tabs}proxy_set_header X-Forwarded-For        $proxy_add_x_forwarded_for;");
-                sb.AppendLine($"{tabs}proxy_set_header X-Forwarded-Host       $host;");
-                sb.AppendLine($"{tabs}proxy_set_header X-Forwarded-Server     $host;");
-                sb.AppendLine($"{tabs}proxy_set_header X-Forwarded-Proto      $scheme;");
-                sb.AppendLine($"{tabs}proxy_set_header X-Forwarded-Path       $request_uri;");
-                if (!location.Trim().StartsWith("~"))
-                    sb.AppendLine($"{tabs}proxy_set_header X-Forwarded-PathBase   {location};");
-
-                sb.AppendLine($"{tabs}proxy_cache_bypass $http_upgrade;");
-            }
-            sb.AppendLine($"{string.Join("", Enumerable.Range(0, level).Select(r => "\t"))}}}");
-
-
-
-        }
-
-
-
-        private void LaunchNginxProcess(string arguments){...}
-
-
-        protected override Task OnCloseAsync(CancellationToken cancellationToken){...}      
-       
-        private DateTimeOffset lastWritten = DateTimeOffset.MinValue;
-        public async Task DeleteGatewayServiceAsync(string v, CancellationToken cancellationToken)
-        {
-            var applicationName = this.Context.CodePackageActivationContext.ApplicationName;
-            var actorServiceUri = new Uri($"{applicationName}/GatewayServiceManagerActorService");
-            List<long> partitions = await GetPartitionsAsync(actorServiceUri);
-            var serviceProxyFactory = new ServiceProxyFactory();
-
-          
-            foreach (var partition in partitions)
-            {
-                var actorService = serviceProxyFactory.CreateServiceProxy<IGatewayServiceManagerActorService>(actorServiceUri, new ServicePartitionKey(partition));
-                await actorService.DeleteGatewayServiceAsync(v,cancellationToken);
-            }
-
-        }
-        public async Task<List<GatewayServiceRegistrationData>> GetGatewayServicesAsync(CancellationToken cancellationToken)
-        {
-            var applicationName = this.Context.CodePackageActivationContext.ApplicationName;
-            var actorServiceUri = new Uri($"{applicationName}/GatewayServiceManagerActorService");
-            List<long> partitions = await GetPartitionsAsync(actorServiceUri);
-
-            var serviceProxyFactory = new ServiceProxyFactory();
-
-            var all = new List<GatewayServiceRegistrationData>();
-            foreach (var partition in partitions)
-            {
-                var actorService = serviceProxyFactory.CreateServiceProxy<IGatewayServiceManagerActorService>(actorServiceUri, new ServicePartitionKey(partition));
-
-                var state = await actorService.GetGatewayServicesAsync(cancellationToken);
-                all.AddRange(state);
-
-            }
-            return all;
-        }
-         
-        private async Task<List<long>> GetPartitionsAsync(Uri actorServiceUri)
-        {
-            var partitions = new List<long>();
-            var servicePartitionList = await _fabricClient.QueryManager.GetPartitionListAsync(actorServiceUri);
-            foreach (var servicePartition in servicePartitionList)
-            {
-                var partitionInformation = servicePartition.PartitionInformation as Int64RangePartitionInformation;
-                partitions.Add(partitionInformation.LowKey);
-            }
-
-            return partitions;
-        }
-
-        public async Task<CertGenerationState> GetCertGenerationStateAsync(string hostname, SslOptions options, CancellationToken token)
-        {
-            var applicationName = this.Context.CodePackageActivationContext.ApplicationName;
-            var actorServiceUri = new Uri($"{applicationName}/GatewayServiceManagerActorService");
-            List<long> partitions = await GetPartitionsAsync(actorServiceUri);
-
-            var serviceProxyFactory = new ServiceProxyFactory();
-
-            var actors = new Dictionary<long, DateTimeOffset>();
-            foreach (var partition in partitions)
-            {
-                var actorService = serviceProxyFactory.CreateServiceProxy<IGatewayServiceManagerActorService>(actorServiceUri, new ServicePartitionKey(partition));
-
-                var state = await actorService.GetCertGenerationInfoAsync(hostname, options, token);
-                if (state != null && state.RunAt.HasValue && state.RunAt.Value > DateTimeOffset.UtcNow.Subtract(TimeSpan.FromDays(14)))
-                {
-                    return state;
-                }
-
-            }
-
-            var gateway = ActorProxy.Create<IGatewayServiceManagerActor>(new ActorId(0));
-            await gateway.RequestCertificateAsync(hostname, options);
-
-            return null;
-        }
-        public async Task SetLastUpdatedAsync(DateTimeOffset time, CancellationToken token)
-        {
-      
-            var gateway = ActorProxy.Create<IGatewayServiceManagerActor>(new ActorId(0));
-            await gateway.SetLastUpdatedNow();
-           
-        }
-        public async Task<IDictionary<long, DateTimeOffset>> GetLastUpdatedAsync(CancellationToken token)
-        {
-
-            var applicationName = this.Context.CodePackageActivationContext.ApplicationName;
-            var actorServiceUri = new Uri($"{applicationName}/GatewayServiceManagerActorService");
-            List<long> partitions = await GetPartitionsAsync(actorServiceUri);
-
-            var serviceProxyFactory = new ServiceProxyFactory();
-
-            var actors = new Dictionary<long, DateTimeOffset>();
-            foreach (var partition in partitions)
-            {
-                var actorService = serviceProxyFactory.CreateServiceProxy<IGatewayServiceManagerActorService>(actorServiceUri, new ServicePartitionKey(partition));
-
-                var counts = await actorService.GetLastUpdatedAsync(token);
-                foreach (var count in counts)
-                {
-                    actors.Add(count.Key, count.Value);
-                }
-            }
-            return actors;
-        }
-
-        protected override async Task RunAsync(CancellationToken cancellationToken)
+		protected override async Task RunAsync(CancellationToken cancellationToken)
         {
 
 
@@ -416,14 +182,14 @@ and the host service that uses a startup class.
 
 
         }
-        #endregion StatelessService
+     
 
 
     }
 ```
 
 ### EarthML IdentityServer
-Also used in my identity server service fabric service
+Also used in my identity server service fabric service, which also uses a startup class that implements IStartup.
 
 
 ```
@@ -502,4 +268,159 @@ Also used in my identity server service fabric service
         }
     }
 
+```
+
+### EarthML Portal
+
+The EarthML portal also uses dependency injection and configure the aspnet core application without a startup.
+
+```
+
+    public class OidcClientConfiguration
+    {
+        public string Authority { get; set; }
+
+        [JsonProperty("client_id")]
+        public string ClientId { get; set; }
+    }
+
+
+    public class Program
+    {
+
+        private const string LiterateLogTemplate = "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message}{NewLine}{Exception}{NewLine}";
+
+        public static void Main(string[] args)
+        {
+            var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+            var config = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{environmentName}.json", optional: true)
+                .AddEnvironmentVariables().Build();
+
+            using (var container = new UnityContainer()
+                       .AsFabricContainer()
+                       .AddOptions()
+                       .UseConfiguration(config) //willl also be set on hostbuilder
+                       .ConfigureSerilogging(logConfiguration =>
+                           logConfiguration.MinimumLevel.Information()
+                           .Enrich.FromLogContext()
+                           .WriteTo.LiterateConsole(outputTemplate: LiterateLogTemplate))
+                       .ConfigureApplicationInsights()
+                       .Configure<OidcClientConfiguration>("OidcClientConfiguration"))
+            {
+
+                if (args.Contains("--serviceFabric"))
+                {
+                    RunInServiceFabric(container);
+                }
+                else
+                {
+                    RunOnIIS(container);
+                }
+            }
+        }
+
+        private static void RunOnIIS(IUnityContainer container)
+        {
+            using (var host = 
+                new WebHostBuilder()
+                        .UseKestrel()
+                        .UseIISIntegration()
+                        .UseWebRoot("artifacts/app")
+                        .UseContentRoot(Directory.GetCurrentDirectory())
+                        .ConfigureServices(ConfigureServices)
+                        .ConfigureServices(services => services.AddSingleton<IServiceProviderFactory<IServiceCollection>>(new UnityServiceProviderFactory(container)))
+                        .Configure(app =>
+                        {
+                            if (app.ApplicationServices.GetService<IHostingEnvironment>().IsDevelopment())
+                            {
+                                app.UseDeveloperExceptionPage();
+                            }
+
+                            // to do - wire in our HTTP endpoints
+                            app.Use(async (ctx, next) =>
+                            {
+                                if (Path.GetExtension(ctx.Request.Path) == ".ts")
+                                {
+
+                                    await ctx.Response.WriteAsync(File.ReadAllText(ctx.Request.Path.Value.Substring(1)));
+                                }
+                                else
+                                {
+                                    await next();
+                                }
+
+                            });
+
+                             
+                            app.UseStaticFiles();
+                            app.UseWebPages();
+                        })
+                    .Build())
+            {
+
+                host.Run();
+
+
+            }
+        }
+
+        private static void RunInServiceFabric(IUnityContainer container)
+        {
+            container.WithKestrelHosting("EarthML.Mapify.PortalType",
+                new KestrelHostingServiceOptions
+                {
+                    GatewayOptions = new GatewayOptions
+                    {
+                        Key = "EarthML.Mapify.PortalType",
+                        ServerName = "www.gomapify.com www.mapify.dk www.mapify.nu local.earthml.com",
+                        ReverseProxyLocation = "/app/",
+                        Ssl = new SslOptions
+                        {
+                            Enabled = true,
+                            SignerEmail = "info@earthml.com"
+                        },
+                    }
+                }, (host) =>
+                {
+                    host
+                    .ConfigureServices(ConfigureServices)
+                    .Configure(app =>
+                    { 
+                        if (app.ApplicationServices.GetService<IHostingEnvironment>().IsDevelopment())
+                        {
+                            app.UseDeveloperExceptionPage();
+                        }
+
+                        app.Use((ctx, next) =>
+                        {
+                            var a = ctx.RequestServices.GetService<IOptions<OidcClientConfiguration>>();
+                            var testa = ctx.RequestServices.GetService<IEnumerable<IConfigureOptions<OidcClientConfiguration>>>();
+                            var testb = ctx.RequestServices.GetService<IConfigureOptions<OidcClientConfiguration>[]>();
+                            var testc = ctx.RequestServices.GetService<IUnityContainer>();
+                            var test = testc.Resolve<IEnumerable<IConfigureOptions<OidcClientConfiguration>>>().ToArray();
+                            var test1 = testc.Resolve<IConfigureOptions<OidcClientConfiguration>[]>();
+                            return next();
+                        });
+
+                        app.UseStaticFiles();
+                        app.UseWebPages();
+                    });
+
+                });
+
+            Thread.Sleep(Timeout.Infinite);
+        }
+
+        private static void ConfigureServices(IServiceCollection services)
+        {
+            services.AddWebPages(new WebPagesOptions { RootViewName = "index", ViewsFolderName = "src" });
+
+
+        }
+    }
+	
 ```
