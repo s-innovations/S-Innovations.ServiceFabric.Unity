@@ -25,7 +25,7 @@ Extension methods to the unity container has been made such the same methods tha
 
 ## TODO
 
-- [] Verify that the above example of what happens is still accurate after all the refactoring.
+- [ ] Verify that the above example of what happens is still accurate after all the refactoring.
 - [x] Remove dependency on unity. Note: Will not happen, as IOC of dotnet core do not support child containers. Therefore we must bring our own container. I been using Unity for all the time I remember, so I will be sticking with this. Consider abstractin it out so you also can bring your own. For now there is no arguments to change this.
 - [x] Use CoreCLR dependency injection instead. Note: Its been integrated such IServiceProviderFactory is used. Meaning that aspnet core apps can use the container and registrations to their apps also.
 - [x] When dotnet core 1.1.0 is out, its possible to make services go from main.cs to startup.cs. All servics registered in main can now be used in nested services, like dotnet core apps.
@@ -40,7 +40,7 @@ It uses letsencrypt to automatically set up certificates and ssloffloading for b
 Below there is also two examples of using the gateway + dependency injection.
 
 TODO:
-- [] Insert URL
+- [ ] Insert URL
 
 ```
 public class Program
