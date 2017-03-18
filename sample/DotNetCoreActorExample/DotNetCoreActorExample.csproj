@@ -26,9 +26,9 @@
   </ItemGroup>
 
   <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">
-    <Exec Command="cmd /c copy ..\..\packages\Microsoft.ServiceFabric.Actors.2.2.207\build\FabActUtil.exe .\bin\Debug\net452\win7-x64\FabActUtil.exe" />
+    <!--<Exec Command="cmd /c copy ..\..\packages\Microsoft.ServiceFabric.Actors.2.2.207\build\FabActUtil.exe .\bin\Debug\net452\win7-x64\FabActUtil.exe" />
     <Exec Command=".\bin\Debug\net452\win7-x64\FabActUtil.exe /spp:PackageRoot /t:manifest /sp:DotNetCoreActorExample /in:.\bin\Debug\net452\win7-x64\DotNetCoreActorExample.exe" />
-    <Exec Command="cmd /c del .\bin\Debug\net452\win7-x64\FabActUtil.exe" />
+    <Exec Command="cmd /c del .\bin\Debug\net452\win7-x64\FabActUtil.exe" />-->
   </Target>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
