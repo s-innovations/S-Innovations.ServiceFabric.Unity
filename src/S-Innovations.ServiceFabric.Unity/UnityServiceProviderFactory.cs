@@ -43,10 +43,15 @@ namespace SInnovations.ServiceFabric.Unity
 
             return services;
         }
-
+        private HashSet<ServiceDescriptor> _descriptors = new HashSet<ServiceDescriptor>();
         public IServiceProvider CreateServiceProvider(IServiceCollection containerBuilder)
         {
-            return root.Populate(containerBuilder).Resolve<IServiceProvider>();           
+            foreach(var desc in containerBuilder)
+            {
+                if(!_descriptors.Contains(desc))
+                    _descriptors.Add(desc);
+            }
+            return root.Populate(_descriptors).Resolve<IServiceProvider>();           
          
         }
     }

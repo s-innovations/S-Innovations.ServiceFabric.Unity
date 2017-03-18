@@ -16,10 +16,138 @@ using Microsoft.Practices.Unity;
 using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using Microsoft.Practices.ObjectBuilder2;
+using System.Diagnostics;
+using Microsoft.Practices.Unity.ObjectBuilder;
+using System.Collections.Generic;
 
 namespace SInnovations.ServiceFabric.Unity
 {
-     
+
+    //http://stackoverflow.com/questions/39173345/unity-with-asp-net-core-and-mvc6-core
+    public sealed class CustomBuilderStrategy : BuilderStrategy
+    {
+        private readonly CustomBuildExtension extension;
+
+        public CustomBuilderStrategy(CustomBuildExtension extension)
+        {
+            this.extension = extension;
+        }
+
+        private IUnityContainer GetUnityFromBuildContext(IBuilderContext context)
+        {
+            var lifetime = context.Policies.Get<ILifetimePolicy>(NamedTypeBuildKey.Make<IUnityContainer>());
+            return lifetime.GetValue() as IUnityContainer;
+        }
+
+
+       
+        private class DerivedTypeConstructorSelectorPolicy : IConstructorSelectorPolicy
+        {
+
+            private readonly IConstructorSelectorPolicy _originalConstructorSelectorPolicy;
+            private readonly IUnityContainer _container;
+
+            public DerivedTypeConstructorSelectorPolicy(IUnityContainer container, IConstructorSelectorPolicy originalSelectorPolicy)
+            {
+                this._originalConstructorSelectorPolicy = originalSelectorPolicy;
+                this._container = container;
+            }
+
+            public SelectedConstructor SelectConstructor(IBuilderContext context, IPolicyList resolverPolicyDestination)
+            {
+                var originalConstructor = _originalConstructorSelectorPolicy.SelectConstructor(context, resolverPolicyDestination);
+                
+                if (CanResolve(originalConstructor.Constructor.GetParameters()))
+                {
+                    return originalConstructor;
+                }
+                else
+                {
+                    var newSelectedConstructor = FindNewCtor(originalConstructor);
+                    foreach (var newParameterResolver in 
+                        originalConstructor.GetParameterResolvers().Take(newSelectedConstructor.Constructor.GetParameters().Length))
+                    {
+                        newSelectedConstructor.AddParameterResolver(newParameterResolver);
+                    }
+
+                    return newSelectedConstructor;
+                }
+            }
+
+            private SelectedConstructor FindNewCtor(SelectedConstructor originalConstructor)
+            {
+                var implementingType = originalConstructor.Constructor.DeclaringType;
+                var constructors = implementingType.GetTypeInfo()
+                  .DeclaredConstructors
+                  .Where(constructor => constructor.IsPublic && constructor != originalConstructor.Constructor)
+                  .ToArray();
+
+                if (constructors.Length == 1)
+                    return new SelectedConstructor(constructors[0]);
+
+                Array.Sort(constructors,
+                   (a, b) => b.GetParameters().Length.CompareTo(a.GetParameters().Length));
+
+                var newCtor = constructors.FirstOrDefault(c => CanResolve(c.GetParameters()));
+                return new SelectedConstructor(newCtor);
+            }
+
+            private bool CanResolve(ParameterInfo[] originalParams)
+            {
+                var canResolve = originalParams.Select(CanResolve).ToArray();
+                var can = canResolve.All(c => c);
+                return can;
+            }
+
+            private bool CanResolve(ParameterInfo arg)
+            {
+                var type = arg.ParameterType;
+                if (type.IsGenericType)
+                {
+                    var gerericType = type.GetGenericTypeDefinition();
+                    if (gerericType == typeof(IEnumerable<>) ||
+                        _container.IsRegistered(gerericType))
+                    {
+                        return true;
+                    }
+                }
+
+                return _container.IsRegistered(type);
+            }
+        }
+        public override void PreBuildUp(IBuilderContext context)
+        {
+            if (context.Existing != null)
+            {
+                return;
+            }
+
+            
+
+            var originalSelectorPolicy = context.Policies.Get<IConstructorSelectorPolicy>(context.BuildKey,
+                out IPolicyList selectorPolicyDestination);
+
+            selectorPolicyDestination.Set<IConstructorSelectorPolicy>(
+                new DerivedTypeConstructorSelectorPolicy(
+                    GetUnityFromBuildContext(context), originalSelectorPolicy), 
+                context.BuildKey);
+             
+        }
+
+    }
+
+    public sealed class CustomBuildExtension : UnityContainerExtension
+    {
+        //  public Func<Type, Type, String, MethodBase, IUnityContainer, Object> Constructor { get; set; }
+
+        protected override void Initialize()
+        {
+            var strategy = new CustomBuilderStrategy(this);
+            this.Context.Strategies.Add(strategy, UnityBuildStage.PreCreation);
+        }
+    }
+
     public static class UnityFabricExtensions
     {
         /// <summary>
@@ -28,10 +156,10 @@ namespace SInnovations.ServiceFabric.Unity
         /// <param name="container"></param>
         /// <returns></returns>
         public static IUnityContainer WithExtension(this IUnityContainer container)
-        {          
-           return container.AddExtension(new EnumerableExtension());            
+        {
+            return container.AddExtension(new EnumerableExtension()).AddExtension(new CustomBuildExtension());
         }
-      
+
         /// <summary>
         /// Creates a new Container from the <see cref="FabricRuntime"/>
         /// </summary>
@@ -58,11 +186,11 @@ namespace SInnovations.ServiceFabric.Unity
         /// <param name="container"></param>
         /// <param name="logger"></param>
         /// <returns></returns>
-        public static IUnityContainer ConfigureLogging(this IUnityContainer container,ILoggerFactory logger)
+        public static IUnityContainer ConfigureLogging(this IUnityContainer container, ILoggerFactory logger)
         {
             return container.RegisterInstance(logger);
         }
-         
+
         /// <summary>
         /// UseConfiguration to setup root configuration.
         /// </summary>
@@ -72,18 +200,18 @@ namespace SInnovations.ServiceFabric.Unity
         /// <returns></returns>
         public static IUnityContainer UseConfiguration(this IUnityContainer container, IConfiguration config, string contentRoot = null)
         {
-           
+
             var _options = new WebHostOptions(config);
             var appEnvironment = PlatformServices.Default.Application;
 
             var applicationName = _options.ApplicationName ?? appEnvironment.ApplicationName;
 
             var environment = new HostingEnvironment();
-            environment.Initialize(applicationName, contentRoot?? Directory.GetCurrentDirectory(), _options);
+            environment.Initialize(applicationName, contentRoot ?? Directory.GetCurrentDirectory(), _options);
 
             container.RegisterInstance<IHostingEnvironment>(environment);
             container.RegisterInstance(config);
-            if(config is IConfigurationRoot)
+            if (config is IConfigurationRoot)
             {
                 container.RegisterInstance(config as IConfigurationRoot);
             }
@@ -91,7 +219,7 @@ namespace SInnovations.ServiceFabric.Unity
             return container;
         }
 
-     
+
         /// <summary>
         /// Add AspNet Core Options support to the container
         /// </summary>
@@ -110,7 +238,7 @@ namespace SInnovations.ServiceFabric.Unity
         /// <returns></returns>
         public static IUnityContainer BuildConfiguration(this IUnityContainer container, IConfigurationBuilder builder)
         {
-            return container.UseConfiguration(builder.Build());        
+            return container.UseConfiguration(builder.Build());
         }
 
         /// <summary>
@@ -121,7 +249,7 @@ namespace SInnovations.ServiceFabric.Unity
         /// <returns></returns>
         public static IConfigurationRoot Build(this IConfigurationBuilder builder, IUnityContainer container)
         {
-            var a = builder.Build();           
+            var a = builder.Build();
             container.RegisterInstance(a);
             container.UseConfiguration(a);
             return a;
@@ -136,7 +264,7 @@ namespace SInnovations.ServiceFabric.Unity
         /// <returns></returns>
         public static IUnityContainer Configure<T>(this IUnityContainer container, IConfigurationSection configuration) where T : class
         {
-            container.RegisterInstance<IOptionsChangeTokenSource<T>>(typeof(T).AssemblyQualifiedName,new ConfigurationChangeTokenSource<T>(configuration));
+            container.RegisterInstance<IOptionsChangeTokenSource<T>>(typeof(T).AssemblyQualifiedName, new ConfigurationChangeTokenSource<T>(configuration));
             container.RegisterInstance<IConfigureOptions<T>>(typeof(T).AssemblyQualifiedName, new ConfigureFromConfigurationOptions<T>(configuration));
             return container;
         }
@@ -160,7 +288,7 @@ namespace SInnovations.ServiceFabric.Unity
         /// <returns></returns>
 
         private static IUnityContainer AsFabricContainerInternal(this IUnityContainer container)
-        { 
+        {
             container.RegisterType<ICodePackageActivationContext>(new ContainerControlledLifetimeManager(), new InjectionFactory(c => FabricRuntime.GetActivationContext()));
             container.RegisterType<ConfigurationPackage>(new ContainerControlledLifetimeManager(), new InjectionFactory((c) => c.Resolve<ICodePackageActivationContext>().GetConfigurationPackageObject("config")));
             container.RegisterType<FabricClient>(new ContainerControlledLifetimeManager(), new InjectionFactory((c) => new FabricClient()));
@@ -202,7 +330,7 @@ namespace SInnovations.ServiceFabric.Unity
         public static IUnityContainer WithActor<TActor>(this IUnityContainer container, ActorServiceSettings settings = null) where TActor : ActorBase
         {
             return container.WithActor<TActor, ActorService>(
-                (context,actorType,actorFactory) =>
+                (context, actorType, actorFactory) =>
                     new ActorService(context, actorTypeInfo: actorType, actorFactory: actorFactory, settings: settings));
         }
 
@@ -214,9 +342,9 @@ namespace SInnovations.ServiceFabric.Unity
         /// <param name="container"></param>
         /// <param name="ActorServiceFactory"></param>
         /// <returns></returns>
-        public static IUnityContainer WithActor<TActor,TActorService>(
-            this IUnityContainer container, 
-            Func<StatefulServiceContext, ActorTypeInformation,Func<ActorService,ActorId, TActor>,TActorService> ActorServiceFactory)
+        public static IUnityContainer WithActor<TActor, TActorService>(
+            this IUnityContainer container,
+            Func<StatefulServiceContext, ActorTypeInformation, Func<ActorService, ActorId, TActor>, TActorService> ActorServiceFactory)
             where TActor : ActorBase
             where TActorService : ActorService
         {
@@ -229,10 +357,11 @@ namespace SInnovations.ServiceFabric.Unity
             }
 
             container.RegisterType(typeof(TActor), ActorProxyTypeFactory.CreateType<TActor>(), new HierarchicalLifetimeManager());
-            ActorRuntime.RegisterActorAsync<TActor>((context, actorType) => {
+            ActorRuntime.RegisterActorAsync<TActor>((context, actorType) =>
+            {
                 try
                 {
-                    return ActorServiceFactory(context, actorType, (service, id) =>                      
+                    return ActorServiceFactory(context, actorType, (service, id) =>
                                container.CreateChildContainer()
                                    .WithExtension()
                                    .RegisterInstance(service.Context.CodePackageActivationContext, new ExternallyControlledLifetimeManager())
@@ -241,7 +370,7 @@ namespace SInnovations.ServiceFabric.Unity
                 }
                 catch (Exception ex)
                 {
-                    logger.LogCritical(new EventId(100,"FailedToCreateActorService"), ex,"Failed to create ActorService for {ActorName}", typeof(TActor).Name);
+                    logger.LogCritical(new EventId(100, "FailedToCreateActorService"), ex, "Failed to create ActorService for {ActorName}", typeof(TActor).Name);
                     throw;
                 }
             }).GetAwaiter().GetResult();
@@ -252,7 +381,7 @@ namespace SInnovations.ServiceFabric.Unity
             return container;
         }
 
-        
+
         /// <summary>
         /// Add stateless service
         /// </summary>
@@ -288,19 +417,19 @@ namespace SInnovations.ServiceFabric.Unity
 
 
 
-        private static IUnityContainer MakeServiceContainer<T>(IUnityContainer container, T context, Action<IUnityContainer> scopeRegistrations=null) where T : ServiceContext
+        private static IUnityContainer MakeServiceContainer<T>(IUnityContainer container, T context, Action<IUnityContainer> scopeRegistrations = null) where T : ServiceContext
         {
-            
+
             var child = container.CreateChildContainer().WithExtension();
-          
+
             child.RegisterInstance<ServiceContext>(context, new ExternallyControlledLifetimeManager());
-            child.RegisterInstance(context.CodePackageActivationContext,new ExternallyControlledLifetimeManager());
+            child.RegisterInstance(context.CodePackageActivationContext, new ExternallyControlledLifetimeManager());
             child.RegisterInstance(context, new ExternallyControlledLifetimeManager());
 
             scopeRegistrations?.Invoke(child);
 
             return child;
         }
-         
+
     }
 }
