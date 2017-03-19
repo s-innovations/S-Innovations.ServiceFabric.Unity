@@ -23,7 +23,7 @@ namespace SInnovations.ServiceFabric.Unity
 
             
 
-            foreach (var descriptor in descriptors)
+            foreach (var descriptor in descriptors.Reverse())
             {
                 Register(container, descriptor);
             }
