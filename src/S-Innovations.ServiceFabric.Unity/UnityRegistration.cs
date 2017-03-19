@@ -40,7 +40,7 @@ namespace SInnovations.ServiceFabric.Unity
             {
                 if (container.IsRegistered(descriptor.ServiceType))
                 {
-                    name = descriptor.ImplementationType.AssemblyQualifiedName;
+                    name = descriptor.GetHashCode().ToString(); //Guid.NewGuid().ToString("N");
                 }
 
                 var constructors = descriptor.ImplementationType.GetTypeInfo()
@@ -59,7 +59,7 @@ namespace SInnovations.ServiceFabric.Unity
             {
                 if (container.IsRegistered(descriptor.ServiceType))
                 {
-                    name = Guid.NewGuid().ToString("N");
+                    name = descriptor.GetHashCode().ToString();
                 }
 
                 container.RegisterType(descriptor.ServiceType,name,
@@ -74,7 +74,7 @@ namespace SInnovations.ServiceFabric.Unity
             {
                 if (container.IsRegistered(descriptor.ServiceType))
                 {
-                    name = descriptor.ImplementationInstance.GetType().AssemblyQualifiedName;
+                    name = descriptor.GetHashCode().ToString();
                 }
 
                 container.RegisterInstance(descriptor.ServiceType,name,

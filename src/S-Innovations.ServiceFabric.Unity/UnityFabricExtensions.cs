@@ -58,7 +58,7 @@ namespace SInnovations.ServiceFabric.Unity
             {
                 var originalConstructor = _originalConstructorSelectorPolicy.SelectConstructor(context, resolverPolicyDestination);
 
-                if (CanResolve(originalConstructor.Constructor.GetParameters()))
+                if (originalConstructor.Constructor.GetParameters().All(arg => _container.CanResolve(arg.ParameterType)))
                 {
                     return originalConstructor;
                 }
@@ -93,7 +93,8 @@ namespace SInnovations.ServiceFabric.Unity
                 Array.Sort(constructors,
                    (a, b) => b.GetParameters().Length.CompareTo(a.GetParameters().Length));
 
-                var newCtor = constructors.FirstOrDefault(c => CanResolve(c.GetParameters()));
+                var newCtor = constructors.FirstOrDefault(c => c.GetParameters()
+                    .All(arg => _container.CanResolve(arg.ParameterType)));
 
                 if (newCtor == null)
                     return null;
@@ -101,31 +102,8 @@ namespace SInnovations.ServiceFabric.Unity
                 return new SelectedConstructor(newCtor);
             }
 
-            private bool CanResolve(ParameterInfo[] originalParams)
-            {
-                var canResolve = originalParams.Select(CanResolve).ToArray();
-                var can = canResolve.All(c => c);
-                return can;
-            }
 
-            private bool CanResolve(ParameterInfo arg)
-            {
-                var type = arg.ParameterType;
-                if (type.IsClass)
-                    return true;
-
-                if (type.IsGenericType)
-                {
-                    var gerericType = type.GetGenericTypeDefinition();
-                    if (gerericType == typeof(IEnumerable<>) ||
-                        _container.IsRegistered(gerericType))
-                    {
-                        return true;
-                    }
-                }
-
-                return _container.IsRegistered(type);
-            }
+             
         }
         public override void PreBuildUp(IBuilderContext context)
         {
