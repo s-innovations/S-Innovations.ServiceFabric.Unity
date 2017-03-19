@@ -11,7 +11,7 @@ namespace SInnovations.ServiceFabric.Unity
 {
     public class EnumerableResolutionStrategy : BuilderStrategy
     {
-        private delegate object Resolver(IBuilderContext context);
+        private delegate object Resolver(IBuilderContext context, IUnityContainer container);
 
         private static readonly MethodInfo GenericResolveEnumerableMethod =
             typeof(EnumerableResolutionStrategy).GetMethod("ResolveEnumerable",
@@ -34,6 +34,11 @@ namespace SInnovations.ServiceFabric.Unity
                 return;
             }
 
+            var container = context.NewBuildUp<IUnityContainer>();
+
+            if (container.IsRegistered(context.BuildKey.Type))
+                return;
+
             MethodInfo resolverMethod;
             var typeToBuild = GetTypeToBuild(context.BuildKey.Type);
 
@@ -48,7 +53,7 @@ namespace SInnovations.ServiceFabric.Unity
             }
 
             var resolver = (Resolver)Delegate.CreateDelegate(typeof(Resolver), resolverMethod);
-            context.Existing = resolver(context);
+            context.Existing = resolver(context,container);
             context.BuildComplete = true;
         }
 
@@ -67,9 +72,9 @@ namespace SInnovations.ServiceFabric.Unity
             return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Lazy<>);
         }
 
-        private static object ResolveLazyEnumerable<T>(IBuilderContext context)
+        private static object ResolveLazyEnumerable<T>(IBuilderContext context, IUnityContainer container)
         {
-            var container = context.NewBuildUp<IUnityContainer>();
+            //var container = context.NewBuildUp<IUnityContainer>();
 
             var typeToBuild = typeof(T);
             var typeWrapper = typeof(Lazy<T>);
@@ -77,9 +82,9 @@ namespace SInnovations.ServiceFabric.Unity
             return ResolveAll(container, typeToBuild, typeWrapper).OfType<Lazy<T>>().ToList(); ;
         }
 
-        private static object ResolveEnumerable<T>(IBuilderContext context)
+        private static object ResolveEnumerable<T>(IBuilderContext context, IUnityContainer container)
         {
-            var container = context.NewBuildUp<IUnityContainer>();
+           // var container = context.NewBuildUp<IUnityContainer>();
 
             var typeToBuild = typeof(T);
 
