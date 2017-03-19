@@ -190,15 +190,15 @@ namespace SInnovations.ServiceFabric.Unity
         public static IUnityContainer UseConfiguration(this IUnityContainer container, IConfiguration config, string contentRoot = null)
         {
 
-            var _options = new WebHostOptions(config);
-            var appEnvironment = PlatformServices.Default.Application;
+            //var _options = new WebHostOptions(config);
+            //var appEnvironment = PlatformServices.Default.Application;
 
-            var applicationName = _options.ApplicationName ?? appEnvironment.ApplicationName;
+            //var applicationName = _options.ApplicationName ?? appEnvironment.ApplicationName;
 
-            var environment = new HostingEnvironment();
-            environment.Initialize(applicationName, contentRoot ?? Directory.GetCurrentDirectory(), _options);
+            //var environment = new HostingEnvironment();
+            //environment.Initialize(applicationName, contentRoot ?? Directory.GetCurrentDirectory(), _options);
 
-            container.RegisterInstance<IHostingEnvironment>(environment);
+           // container.RegisterType<IHostingEnvironment,HostingEnvironment>();
             container.RegisterInstance(config);
             if (config is IConfigurationRoot)
             {
