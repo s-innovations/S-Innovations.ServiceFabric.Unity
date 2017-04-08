@@ -6,6 +6,7 @@
     <AssemblyName>DependencyInjectionServiceSample</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageId>DependencyInjectionServiceSample</PackageId>
+    <IsServiceFabricServiceProject>True</IsServiceFabricServiceProject>
   </PropertyGroup>
 
   <ItemGroup>
