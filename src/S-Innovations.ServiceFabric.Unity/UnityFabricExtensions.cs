@@ -280,7 +280,12 @@ namespace SInnovations.ServiceFabric.Unity
         /// <returns></returns>
         public static IUnityContainer Configure<T>(this IUnityContainer container, string sectionName) where T : class
         {
-            return container.Configure<T>(container.Resolve<IConfigurationRoot>().GetSection(sectionName));
+            container.RegisterType<IOptionsChangeTokenSource<T>>(typeof(T).AssemblyQualifiedName, new ContainerControlledLifetimeManager(), 
+             new InjectionFactory((c)=> new ConfigurationChangeTokenSource<T>(c.Resolve<IConfigurationRoot>().GetSection(sectionName))));
+            container.RegisterType<IConfigureOptions<T>>(typeof(T).AssemblyQualifiedName, new ContainerControlledLifetimeManager(), 
+              new InjectionFactory((c)=>  new ConfigureFromConfigurationOptions<T>(c.Resolve<IConfigurationRoot>().GetSection(sectionName))));
+            return container;
+
         }
 
 
