@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net462</TargetFramework>
     <AssemblyName>DotNetCoreActorExample</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageId>DotNetCoreActorExample</PackageId>
@@ -32,7 +32,7 @@
     <Exec Command="cmd /c del .\bin\Debug\net452\win7-x64\FabActUtil.exe" />-->
   </Target>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
   </ItemGroup>
 
 </Project>
