@@ -179,33 +179,33 @@ namespace SInnovations.ServiceFabric.Unity
             return container.RegisterInstance(logger);
         }
 
-        /// <summary>
-        /// UseConfiguration to setup root configuration.
-        /// </summary>
-        /// <param name="container"></param>
-        /// <param name="config"></param>
-        /// <param name="contentRoot"></param>
-        /// <returns></returns>
-        public static IUnityContainer UseConfiguration(this IUnityContainer container, IConfiguration config, string contentRoot = null)
-        {
+        ///// <summary>
+        ///// UseConfiguration to setup root configuration.
+        ///// </summary>
+        ///// <param name="container"></param>
+        ///// <param name="config"></param>
+        ///// <param name="contentRoot"></param>
+        ///// <returns></returns>
+        //public static IUnityContainer UseConfiguration(this IUnityContainer container, IConfiguration config, string contentRoot = null)
+        //{
 
-            //var _options = new WebHostOptions(config);
-            //var appEnvironment = PlatformServices.Default.Application;
+        //    //var _options = new WebHostOptions(config);
+        //    //var appEnvironment = PlatformServices.Default.Application;
 
-            //var applicationName = _options.ApplicationName ?? appEnvironment.ApplicationName;
+        //    //var applicationName = _options.ApplicationName ?? appEnvironment.ApplicationName;
 
-            //var environment = new HostingEnvironment();
-            //environment.Initialize(applicationName, contentRoot ?? Directory.GetCurrentDirectory(), _options);
+        //    //var environment = new HostingEnvironment();
+        //    //environment.Initialize(applicationName, contentRoot ?? Directory.GetCurrentDirectory(), _options);
 
-           // container.RegisterType<IHostingEnvironment,HostingEnvironment>();
-            container.RegisterInstance(config);
-            if (config is IConfigurationRoot)
-            {
-                container.RegisterInstance(config as IConfigurationRoot);
-            }
+        //   // container.RegisterType<IHostingEnvironment,HostingEnvironment>();
+        //    container.RegisterInstance(config);
+        //    if (config is IConfigurationRoot)
+        //    {
+        //        container.RegisterInstance(config as IConfigurationRoot);
+        //    }
 
-            return container;
-        }
+        //    return container;
+        //}
 
 
         /// <summary>
@@ -218,30 +218,45 @@ namespace SInnovations.ServiceFabric.Unity
             return container.RegisterType(typeof(IOptions<>), typeof(OptionsManager<>));
         }
 
-        /// <summary>
-        /// Build and add the configuration from configuration builder
-        /// </summary>
-        /// <param name="container"></param>
-        /// <param name="builder"></param>
-        /// <returns></returns>
-        public static IUnityContainer BuildConfiguration(this IUnityContainer container, IConfigurationBuilder builder)
+
+        ///// <summary>
+        ///// Build and add the configuration from configuration builder
+        ///// </summary>
+        ///// <param name="container"></param>
+        ///// <param name="builder"></param>
+        ///// <returns></returns>
+        //public static IUnityContainer BuildConfiguration(this IUnityContainer container, IConfigurationBuilder builder)
+        //{
+        //    return container.UseConfiguration(builder.Build());
+        //}
+
+
+        public static IUnityContainer UseConfiguration(this IUnityContainer container, IConfigurationBuilder builder)
         {
-            return container.UseConfiguration(builder.Build());
+            container.RegisterInstance(builder);
+            container.RegisterType<IConfigurationRoot>(new ContainerControlledLifetimeManager(),
+                new InjectionFactory((c)=>c.Resolve<IConfigurationBuilder>().Build()));
+            container.RegisterType<IConfiguration>(new ContainerControlledLifetimeManager(), new InjectionFactory(c => c.Resolve<IConfigurationRoot>()));
+
+
+            return container;
+
+            //return container.UseConfiguration(builder.Build());
         }
 
-        /// <summary>
-        /// Build the configurationBuilder into the container
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="container"></param>
-        /// <returns></returns>
-        public static IConfigurationRoot Build(this IConfigurationBuilder builder, IUnityContainer container)
-        {
-            var a = builder.Build();
-            container.RegisterInstance(a);
-            container.UseConfiguration(a);
-            return a;
-        }
+        ///// <summary>
+        ///// Build the configurationBuilder into the container
+        ///// </summary>
+        ///// <param name="builder"></param>
+        ///// <param name="container"></param>
+        ///// <returns></returns>
+        //public static IConfigurationRoot Build(this IConfigurationBuilder builder, IUnityContainer container)
+        //{
+        //    var a = builder.Build();
+        //    container.RegisterInstance(a);
+        //    container.UseConfiguration(a);
+        //    return a;
+        //}
 
         /// <summary>
         /// Configure the T for Options<typeparamref name="T"/>
