@@ -38,7 +38,7 @@ namespace DependencyInjectionServiceSample
                 container.RegisterInstance(loggerfac);
 
                 container.WithStatelessService<WebHostingService>("DependencyInjectionServiceSampleType");
-
+    
                
                 Thread.Sleep(Timeout.Infinite);
 

@@ -41,7 +41,7 @@ namespace SInnovations.ServiceFabric.Unity
             BuildType();
             InterceptAllMethods();
 
-            Type proxy = this.typeBuilder.CreateType();
+            Type proxy = this.typeBuilder.CreateTypeInfo();
 
             return Activator.CreateInstance(proxy, args);
         }
@@ -52,7 +52,7 @@ namespace SInnovations.ServiceFabric.Unity
             BuildType();
             InterceptAllMethods();
 
-            Type proxy = this.typeBuilder.CreateType();
+            Type proxy = this.typeBuilder.CreateTypeInfo();
             return proxy;
             //  return Activator.CreateInstance(proxy, args);
         }
@@ -64,7 +64,7 @@ namespace SInnovations.ServiceFabric.Unity
         public void BuidAssembly()
         {
             AssemblyName assemblyName = new AssemblyName("BasicProxy");
-            AssemblyBuilder createdAssembly = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+            AssemblyBuilder createdAssembly = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
             // define module
             this.moduleBuilder = createdAssembly.DefineDynamicModule(assemblyName.Name);
         }
