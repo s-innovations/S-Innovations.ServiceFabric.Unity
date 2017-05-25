@@ -3,27 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Practices.Unity;
 
 namespace SInnovations.ServiceFabric.Unity
 {
-    public static class TypeExtensions
-    {
-        public static IEnumerable<MethodInfo> GetMethods(Type type, BindingFlags flags)
-        {
+    //public static class TypeExtensions
+    //{
+    //    public static IEnumerable<MethodInfo> GetMethods(Type type, BindingFlags flags)
+    //    {
 
-            return type.GetMethods(flags);
-        }
-        public static MethodInfo GetMethod(Type type, string name, BindingFlags flags)
-        {
-            return type.GetMethod(name, flags);
-        }
-        public static Type[] GetGenericArguments(Type type)
-        {
-            return type.GetGenericArguments();
-        }
-    }
+    //        return type.GetMethods(flags);
+    //    }
+    //    public static MethodInfo GetMethod(Type type, string name, BindingFlags flags)
+    //    {
+    //        return type.GetMethod(name, flags);
+    //    }
+    //    public static Type[] GetGenericArguments(Type type)
+    //    {
+    //        return type.GetGenericArguments();
+    //    }
+    //}
     //public static class EnumerableExtension
     //{
     //    public static MethodInfo ConcatMethod = typeof(EnumerableExtension).GetMethod("Concat", BindingFlags.Public | BindingFlags.Static);
@@ -34,88 +33,10 @@ namespace SInnovations.ServiceFabric.Unity
          
     //}
 
-    public class UnityWrappingServiceProvider : IServiceProvider
-    {
-        private IServiceProvider orignal;
-        private IUnityContainer container;
-        public UnityWrappingServiceProvider(IServiceProvider original, IUnityContainer container)
-        {
-            this.orignal = original;
-            this.container = container;
-        }
-        public object GetService(Type serviceType)
-        {
-            
-            if(serviceType == typeof(IServiceScopeFactory) || serviceType == typeof(IServiceScope))
-            {
-                return container.Resolve(serviceType); // TryGet(serviceType);
-            }else if(serviceType == typeof(IUnityContainer))
-            {
-                return this.container;
-            }
-            //else if(serviceType.IsGenericType && serviceType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-            //{
-            //    return EnumerableExtension.ConcatMethod.MakeGenericMethod(serviceType.GenericTypeArguments).Invoke(null,new [] { orignal.GetService(serviceType), TryGet(serviceType) });
-            //}
+    
+   
 
-            //if (container.IsRegistered(serviceType) ||
-            //    (serviceType.IsGenericType && serviceType.GenericTypeArguments.All(t => container.IsRegistered(t))))
-            //{
-            //    return TryGet(serviceType) ?? orignal.GetService(serviceType);
-            //}
-
-            return orignal.GetService(serviceType); // ?? TryGet(serviceType);
-        }
-
-        
-        //private object TryGet(Type serviceType)
-        //{
-        //    try
-        //    {
-        //        return container.Resolve(serviceType);
-        //    }catch(Exception ex)
-        //    {
-        //        return null;
-        //    }
-        //}
-    }
-    public class scopeFactory : IServiceScopeFactory
-    {
-        private IServiceProvider child;
-        private IUnityContainer container;
-        public scopeFactory(IUnityContainer container)
-        {
-            this.container = container;
-            child = this.container.Resolve<IServiceProvider>("old");
-        }
-        public IServiceScope CreateScope()
-        {
-            
-            return new scopewrap(this.container, child.CreateScope());
-        }
-    }
-
-    public class scopewrap : IServiceScope
-    {
-        private IUnityContainer container;
-       
-
-        public scopewrap(IUnityContainer container, IServiceScope aspNetScope)
-        {
-            this.container = container.CreateChildContainer();
-            this.container.RegisterInstance("old", aspNetScope);
-            this.container.RegisterInstance<IServiceProvider>("old", aspNetScope.ServiceProvider);
-           
-
-        }
-        public IServiceProvider ServiceProvider => this.container.Resolve<IServiceProvider>();
-
-        public void Dispose()
-        {
-            this.container.Dispose();
-            
-        }
-    }
+    
 
     public static class UnityGlueConfiguration
     {
@@ -142,18 +63,18 @@ namespace SInnovations.ServiceFabric.Unity
         //        RegisterType(container, lifetime, service, aggregateTypes, miRegisterInstanceOpen);
         //}
 
-        public static IUnityContainer WithCoreCLR(this IUnityContainer container)
-        {
-           // container.RegisterType<IServiceProvider>(new HierarchicalLifetimeManager(), new InjectionFactory(c => new UnityWrappingServiceProvider(c.Resolve<IServiceProvider>("old"), c)));
-           // container.RegisterType<IServiceScopeFactory, scopeFactory>(new HierarchicalLifetimeManager());
+        //public static IUnityContainer WithCoreCLR(this IUnityContainer container)
+        //{
+        //   // container.RegisterType<IServiceProvider>(new HierarchicalLifetimeManager(), new InjectionFactory(c => new UnityWrappingServiceProvider(c.Resolve<IServiceProvider>("old"), c)));
+        //   // container.RegisterType<IServiceScopeFactory, scopeFactory>(new HierarchicalLifetimeManager());
 
-            // container.RegisterType<IServiceScopeFactory, ServiceScopeFactory>();
-            // container.RegisterType<IServiceScope, ServiceScope>();
-            //container.RegisterType<IServiceProvider, ServiceProvider>();
+        //    // container.RegisterType<IServiceScopeFactory, ServiceScopeFactory>();
+        //    // container.RegisterType<IServiceScope, ServiceScope>();
+        //    //container.RegisterType<IServiceProvider, ServiceProvider>();
 
-        //    RegisterEnumerable(container);
-            return container;
-        }
+        ////    RegisterEnumerable(container);
+        //    return container;
+        //}
 
         //private static MethodInfo RegisterInstance()
         //{
@@ -174,32 +95,32 @@ namespace SInnovations.ServiceFabric.Unity
         //        .Select(type => type.Key));
         //}
 
-        public static void RegisterEnumerable(IUnityContainer _container)
-        {
-            _container.RegisterType(typeof(IEnumerable<>), new InjectionFactory((container, enumerableType, name) =>
-            {
-                Type type = TypeExtensions.GetGenericArguments(enumerableType).Single();
-                IEnumerable<object> first = container.ResolveAll(type);
-                object[] objArray;
-                if (!_container.IsRegistered(type) &&
-                        (TypeExtensions.GetGenericArguments(type).Length == 0 ||
-                        !_container.IsRegistered(type.GetGenericTypeDefinition())))
+        //public static void RegisterEnumerable(IUnityContainer _container)
+        //{
+        //    _container.RegisterType(typeof(IEnumerable<>), new InjectionFactory((container, enumerableType, name) =>
+        //    {
+        //        Type type = TypeExtensions.GetGenericArguments(enumerableType).Single();
+        //        IEnumerable<object> first = container.ResolveAll(type);
+        //        object[] objArray;
+        //        if (!_container.IsRegistered(type) &&
+        //                (TypeExtensions.GetGenericArguments(type).Length == 0 ||
+        //                !_container.IsRegistered(type.GetGenericTypeDefinition())))
 
-                    objArray = new object[0];
-                else
-                    objArray = new object[1]
-                    {
-                        container.Resolve(type)
-                    };
+        //            objArray = new object[0];
+        //        else
+        //            objArray = new object[1]
+        //            {
+        //                container.Resolve(type)
+        //            };
 
-                object[] array = first.Concat(objArray).ToArray();
+        //        object[] array = first.Concat(objArray).ToArray();
 
-                return TypeExtensions
-                    .GetMethod(typeof(Enumerable), "OfType", (BindingFlags)24)
-                    .MakeGenericMethod(type).Invoke(null, new object[] { array });
+        //        return TypeExtensions
+        //            .GetMethod(typeof(Enumerable), "OfType", (BindingFlags)24)
+        //            .MakeGenericMethod(type).Invoke(null, new object[] { array });
 
-            }) as InjectionMember);
-        }
+        //    }) as InjectionMember);
+        //}
 
         //    private static Func<ServiceDescriptor, LifetimeManager> GetLifetime()
         //    {

@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>SInnovations.Unity.AspNetCore</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\S-Innovations.Unity.AspNetCore\CustomBuilderStrategy.cs" Link="CustomBuilderStrategy.cs" />
+    <Compile Include="..\S-Innovations.Unity.AspNetCore\CustomBuildExtension.cs" Link="CustomBuildExtension.cs" />
+    <Compile Include="..\S-Innovations.Unity.AspNetCore\EnumerableExtension.cs" Link="EnumerableExtension.cs" />
+    <Compile Include="..\S-Innovations.Unity.AspNetCore\EnumerableResolutionStrategy.cs" Link="EnumerableResolutionStrategy.cs" />
+    <Compile Include="..\S-Innovations.Unity.AspNetCore\scopeFactory.cs" Link="scopeFactory.cs" />
+    <Compile Include="..\S-Innovations.Unity.AspNetCore\scopewrap.cs" Link="scopewrap.cs" />
+    <Compile Include="..\S-Innovations.Unity.AspNetCore\UnityFabricExtensions.cs" Link="UnityFabricExtensions.cs" />
+    <Compile Include="..\S-Innovations.Unity.AspNetCore\UnityRegistration.cs" Link="UnityRegistration.cs" />
+    <Compile Include="..\S-Innovations.Unity.AspNetCore\UnityServiceProvider.cs" Link="UnityServiceProvider.cs" />
+    <Compile Include="..\S-Innovations.Unity.AspNetCore\UnityServiceProviderFactory.cs" Link="UnityServiceProviderFactory.cs" />
+    <Compile Include="..\S-Innovations.Unity.AspNetCore\UnityServiceScope.cs" Link="UnityServiceScope.cs" />
+    <Compile Include="..\S-Innovations.Unity.AspNetCore\UnityServiceScopeFactory.cs" Link="UnityServiceScopeFactory.cs" />
+    <Compile Include="..\S-Innovations.Unity.AspNetCore\UnityTypeExtension.cs" Link="UnityTypeExtension.cs" />
+    <Compile Include="..\S-Innovations.Unity.AspNetCore\UnityWrappingServiceProvider.cs" Link="UnityWrappingServiceProvider.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.0.0-preview2-25229" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.0.0-preview2-25229" />
+    <PackageReference Include="Unity" Version="4.0.1" />
+  </ItemGroup>
+
+</Project>

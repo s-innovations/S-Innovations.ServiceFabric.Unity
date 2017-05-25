@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26419.1
+VisualStudioVersion = 15.0.26507.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{A1C3DC73-B8FC-482E-AE85-C372871D4B9B}"
 EndProject
@@ -22,6 +22,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DependencyInjectionActorSample", "samples\DependencyInjectionActorSample\DependencyInjectionActorSample.csproj", "{2F8EF6DA-2E14-4608-AE4E-A1E8BB95993A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetCoreActorExample", "samples\DotNetCoreActorExample\DotNetCoreActorExample.csproj", "{F797A7E3-E06D-4A24-BB6A-9273F205C574}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "S-Innovations.Unity.AspNetCore", "src\S-Innovations.Unity.AspNetCore\S-Innovations.Unity.AspNetCore.csproj", "{FC921E6F-9FBC-447E-8989-83A79DBCB716}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "S-Innovations.Unity.AspNetCore2", "src\S-Innovations.Unity.AspNetCore2\S-Innovations.Unity.AspNetCore2.csproj", "{F3A8692B-8A99-406C-9E8C-0774DED22BBD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +79,22 @@ Global
 		{F797A7E3-E06D-4A24-BB6A-9273F205C574}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F797A7E3-E06D-4A24-BB6A-9273F205C574}.Release|x64.ActiveCfg = Release|Any CPU
 		{F797A7E3-E06D-4A24-BB6A-9273F205C574}.Release|x64.Build.0 = Release|Any CPU
+		{FC921E6F-9FBC-447E-8989-83A79DBCB716}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC921E6F-9FBC-447E-8989-83A79DBCB716}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC921E6F-9FBC-447E-8989-83A79DBCB716}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FC921E6F-9FBC-447E-8989-83A79DBCB716}.Debug|x64.Build.0 = Debug|Any CPU
+		{FC921E6F-9FBC-447E-8989-83A79DBCB716}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC921E6F-9FBC-447E-8989-83A79DBCB716}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC921E6F-9FBC-447E-8989-83A79DBCB716}.Release|x64.ActiveCfg = Release|Any CPU
+		{FC921E6F-9FBC-447E-8989-83A79DBCB716}.Release|x64.Build.0 = Release|Any CPU
+		{F3A8692B-8A99-406C-9E8C-0774DED22BBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3A8692B-8A99-406C-9E8C-0774DED22BBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3A8692B-8A99-406C-9E8C-0774DED22BBD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F3A8692B-8A99-406C-9E8C-0774DED22BBD}.Debug|x64.Build.0 = Debug|Any CPU
+		{F3A8692B-8A99-406C-9E8C-0774DED22BBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3A8692B-8A99-406C-9E8C-0774DED22BBD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3A8692B-8A99-406C-9E8C-0774DED22BBD}.Release|x64.ActiveCfg = Release|Any CPU
+		{F3A8692B-8A99-406C-9E8C-0774DED22BBD}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,14 +1,13 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Practices.Unity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Practices.Unity;
 using System.Reflection;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace SInnovations.ServiceFabric.Unity
+namespace SInnovations.Unity.AspNetCore
 {
     public static class UnityRegistration
     {
@@ -17,11 +16,11 @@ namespace SInnovations.ServiceFabric.Unity
         {
             container.WithExtension();
             // container.AddExtension(new EnumerableExtension());
-             
+
             container.RegisterType<IServiceProvider, UnityServiceProvider>();
             container.RegisterType<IServiceScopeFactory, UnityServiceScopeFactory>();
 
-            
+
 
             foreach (var descriptor in descriptors.Reverse())
             {
@@ -34,7 +33,7 @@ namespace SInnovations.ServiceFabric.Unity
             ServiceDescriptor descriptor)
         {
             var name = null as string;
-            
+
 
             if (descriptor.ImplementationType != null)
             {
@@ -49,11 +48,11 @@ namespace SInnovations.ServiceFabric.Unity
                    .ToArray();
 
                 var liftime = GetLifetimeManager(descriptor.Lifetime);
-              
-                    container.RegisterType(descriptor.ServiceType,
-                       descriptor.ImplementationType,name,
-                       liftime);
-               
+
+                container.RegisterType(descriptor.ServiceType,
+                   descriptor.ImplementationType, name,
+                   liftime);
+
             }
             else if (descriptor.ImplementationFactory != null)
             {
@@ -62,7 +61,7 @@ namespace SInnovations.ServiceFabric.Unity
                     name = descriptor.GetHashCode().ToString();
                 }
 
-                container.RegisterType(descriptor.ServiceType,name,
+                container.RegisterType(descriptor.ServiceType, name,
                     GetLifetimeManager(descriptor.Lifetime),
                     new InjectionFactory(unity =>
                     {
@@ -77,7 +76,7 @@ namespace SInnovations.ServiceFabric.Unity
                     name = descriptor.GetHashCode().ToString();
                 }
 
-                container.RegisterInstance(descriptor.ServiceType,name,
+                container.RegisterInstance(descriptor.ServiceType, name,
                     descriptor.ImplementationInstance,
                     GetLifetimeManager(descriptor.Lifetime));
             }

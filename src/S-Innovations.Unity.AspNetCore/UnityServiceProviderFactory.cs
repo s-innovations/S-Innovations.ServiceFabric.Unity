@@ -1,17 +1,13 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Practices.Unity;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Practices.Unity;
-using Microsoft.AspNetCore.Hosting;
 
-namespace SInnovations.ServiceFabric.Unity
+namespace SInnovations.Unity.AspNetCore
 {
-  
-
     public class UnityServiceProviderFactory : IServiceProviderFactory<IServiceCollection>
     {
         private readonly IUnityContainer root;
@@ -46,13 +42,13 @@ namespace SInnovations.ServiceFabric.Unity
         private HashSet<ServiceDescriptor> _descriptors = new HashSet<ServiceDescriptor>();
         public IServiceProvider CreateServiceProvider(IServiceCollection containerBuilder)
         {
-            foreach(var desc in containerBuilder)
+            foreach (var desc in containerBuilder)
             {
-                if(!_descriptors.Contains(desc))
+                if (!_descriptors.Contains(desc))
                     _descriptors.Add(desc);
             }
-            return root.Populate(_descriptors).Resolve<IServiceProvider>();           
-         
+            return root.Populate(_descriptors).Resolve<IServiceProvider>();
+
         }
     }
 }

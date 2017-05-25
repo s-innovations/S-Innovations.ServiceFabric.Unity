@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Practices.Unity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Practices.Unity;
 
-namespace SInnovations.ServiceFabric.Unity
+namespace SInnovations.Unity.AspNetCore
 {
     internal class UnityServiceScopeFactory : IServiceScopeFactory
     {
@@ -25,7 +25,7 @@ namespace SInnovations.ServiceFabric.Unity
         private IUnityContainer CreateChildContainer()
         {
             return container.CreateChildContainer()
-                .WithExtension(); 
+                .WithExtension();
         }
     }
 }
