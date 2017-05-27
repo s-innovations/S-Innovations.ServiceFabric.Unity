@@ -15,7 +15,6 @@ namespace SInnovations.Unity.AspNetCore
             IEnumerable<ServiceDescriptor> descriptors)
         {
             container.WithExtension();
-            // container.AddExtension(new EnumerableExtension());
 
             container.RegisterType<IServiceProvider, UnityServiceProvider>();
             container.RegisterType<IServiceScopeFactory, UnityServiceScopeFactory>();

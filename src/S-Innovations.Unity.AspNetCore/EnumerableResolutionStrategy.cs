@@ -104,7 +104,7 @@ namespace SInnovations.Unity.AspNetCore
 
             return names.Distinct()
                 .Select(t => t.Name)
-                .Select(name => container.Resolve(typeWrapper, name));
+                .Select(name => container.Resolve(typeWrapper, name)).Reverse();
         }
 
         private static IEnumerable<ContainerRegistration> GetRegisteredNames(IUnityContainer container, Type type)
