@@ -23,8 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.0.0-preview3-25814" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.0.0-preview3-25814" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.0.0-preview3-26073" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.0.0-preview3-26073" />
     <PackageReference Include="Unity" Version="4.0.1" />
   </ItemGroup>
 
