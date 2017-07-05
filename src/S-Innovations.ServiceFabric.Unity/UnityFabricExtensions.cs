@@ -159,7 +159,7 @@ namespace SInnovations.ServiceFabric.Unity
         public static IUnityContainer WithActor<TActor>(this IUnityContainer container, ActorServiceSettings settings = null) where TActor : ActorBase
         {
             return container.WithActor<TActor, ActorService>(
-                (context, actorType, actorFactory) =>
+                (servicecontainer, context, actorType, actorFactory) =>
                     new ActorService(context, actorTypeInfo: actorType, actorFactory: actorFactory, settings: settings));
         }
 
@@ -173,7 +173,7 @@ namespace SInnovations.ServiceFabric.Unity
         /// <returns></returns>
         public static IUnityContainer WithActor<TActor, TActorService>(
             this IUnityContainer container,
-            Func<StatefulServiceContext, ActorTypeInformation, Func<ActorService, ActorId, TActor>, TActorService> ActorServiceFactory)
+            Func<IUnityContainer,StatefulServiceContext, ActorTypeInformation, Func<ActorService, ActorId, TActor>, TActorService> ActorServiceFactory)
             where TActor : ActorBase
             where TActorService : ActorService
         {
@@ -190,8 +190,9 @@ namespace SInnovations.ServiceFabric.Unity
             {
                 try
                 {
-                    return ActorServiceFactory(context, actorType, (service, id) =>
-                               container.CreateChildContainer()
+                    var serviceContainer = container.CreateChildContainer();
+                    return ActorServiceFactory(serviceContainer,  context, actorType, (service, id) =>
+                               serviceContainer.CreateChildContainer()
                                    .WithExtension()
                                    .RegisterInstance(service.Context.CodePackageActivationContext, new ExternallyControlledLifetimeManager())
                                    .RegisterInstance(service, new ExternallyControlledLifetimeManager())
