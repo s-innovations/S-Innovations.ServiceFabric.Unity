@@ -55,12 +55,21 @@ namespace SInnovations.Unity.AspNetCore
                     else
                     {
                         var newSelectedConstructor = FindNewCtor(originalConstructor);
-                        if (newSelectedConstructor == null)
-                            return originalConstructor;
+                        var tryNulls = newSelectedConstructor == null;
+                        if (tryNulls)
+                            newSelectedConstructor = new SelectedConstructor(originalConstructor.Constructor);
 
                         foreach (var parameter in newSelectedConstructor.Constructor.GetParameters())
                         {
-                            newSelectedConstructor.AddParameterResolver(parameterResolver.GetResolver(parameter));
+                            if (tryNulls && !_container.CanResolve(parameter.ParameterType) && parameter.HasDefaultValue)
+                            {
+                                
+                                newSelectedConstructor.AddParameterResolver(new LiteralValueDependencyResolverPolicy(null));
+                            }
+                            else
+                            {
+                                newSelectedConstructor.AddParameterResolver(parameterResolver.GetResolver(parameter));
+                            }
                         }
                         //    foreach (var newParameterResolver in
                         //    originalConstructor.GetParameterResolvers().Take(newSelectedConstructor.Constructor.GetParameters().Length))
@@ -93,6 +102,7 @@ namespace SInnovations.Unity.AspNetCore
             {
                 public IDependencyResolverPolicy GetResolver(ParameterInfo parameterInfo)
                 {
+                  
                     return CreateResolver(parameterInfo);
                 }
             }
