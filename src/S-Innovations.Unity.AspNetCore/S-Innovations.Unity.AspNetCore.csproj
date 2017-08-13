@@ -5,6 +5,10 @@
     <RootNamespace>SInnovations.Unity.AspNetCore</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG;ASPNETCORE1</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="[1.1.2,2.0)" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="[1.1.2,2.0)" />

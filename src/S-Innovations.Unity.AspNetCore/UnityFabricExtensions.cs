@@ -74,7 +74,20 @@ namespace SInnovations.Unity.AspNetCore
         /// <returns></returns>
         public static IUnityContainer AddOptions(this IUnityContainer container)
         {
-            return container.RegisterType(typeof(IOptions<>), typeof(OptionsManager<>));
+#if ASPNETCORE1
+            return container.RegisterType(typeof(IOptions<>), typeof(OptionsManager<>))
+                            .RegisterType(typeof(IOptionsSnapshot<>), typeof(OptionsManager<>), new HierarchicalLifetimeManager())
+                            .RegisterType(typeof(IOptionsMonitor<>), typeof(OptionsMonitor<>), new ContainerControlledLifetimeManager());
+#endif
+
+#if ASPNETCORE2
+            return container.RegisterType(typeof(IOptions<>), typeof(OptionsManager<>), new ContainerControlledLifetimeManager())
+                .RegisterType(typeof(IOptionsSnapshot<>), typeof(OptionsManager<>), new HierarchicalLifetimeManager())
+           .RegisterType(typeof(IOptionsMonitor<>), typeof(OptionsMonitor<>), new ContainerControlledLifetimeManager())
+            .RegisterType(typeof(IOptionsFactory<>), typeof(OptionsFactory<>), new TransientLifetimeManager())
+           .RegisterType(typeof(IOptionsMonitorCache<>), typeof(OptionsCache<>), new ContainerControlledLifetimeManager());
+#endif
+
         }
 
 

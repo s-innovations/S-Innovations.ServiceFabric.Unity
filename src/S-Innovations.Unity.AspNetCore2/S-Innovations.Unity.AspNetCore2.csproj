@@ -5,6 +5,10 @@
     <RootNamespace>SInnovations.Unity.AspNetCore</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG;ASPNETCORE2</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Include="..\S-Innovations.Unity.AspNetCore\CustomBuilderStrategy.cs" Link="CustomBuilderStrategy.cs" />
     <Compile Include="..\S-Innovations.Unity.AspNetCore\CustomBuildExtension.cs" Link="CustomBuildExtension.cs" />
