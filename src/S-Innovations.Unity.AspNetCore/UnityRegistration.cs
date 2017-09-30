@@ -16,10 +16,7 @@ namespace SInnovations.Unity.AspNetCore
         {
             container.WithExtension();
 
-            container.RegisterType<IServiceProvider, UnityServiceProvider>();
-            container.RegisterType<IServiceScopeFactory, UnityServiceScopeFactory>();
-
-
+          
 
             foreach (var descriptor in descriptors.Reverse())
             {

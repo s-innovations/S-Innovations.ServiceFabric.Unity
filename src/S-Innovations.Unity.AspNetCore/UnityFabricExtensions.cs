@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Practices.Unity;
@@ -80,7 +81,7 @@ namespace SInnovations.Unity.AspNetCore
                             .RegisterType(typeof(IOptionsMonitor<>), typeof(OptionsMonitor<>), new ContainerControlledLifetimeManager());
 #endif
 
-#if ASPNETCORE2
+#if NETSTANDARD2_0
             return container.RegisterType(typeof(IOptions<>), typeof(OptionsManager<>), new ContainerControlledLifetimeManager())
                 .RegisterType(typeof(IOptionsSnapshot<>), typeof(OptionsManager<>), new HierarchicalLifetimeManager())
            .RegisterType(typeof(IOptionsMonitor<>), typeof(OptionsMonitor<>), new ContainerControlledLifetimeManager())
@@ -98,6 +99,9 @@ namespace SInnovations.Unity.AspNetCore
         /// <returns></returns>
         public static IUnityContainer WithExtension(this IUnityContainer container)
         {
+            container.RegisterType<IServiceProvider, UnityServiceProvider>();
+            container.RegisterType<IServiceScopeFactory, UnityServiceScopeFactory>();
+
             return container.AddExtension(new EnumerableExtension()).AddExtension(new CustomBuildExtension());
         }
     }
