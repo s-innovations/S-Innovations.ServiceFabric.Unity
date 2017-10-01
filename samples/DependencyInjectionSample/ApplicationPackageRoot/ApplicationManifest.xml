@@ -1,5 +1,42 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="DependencyInjectionSampleType" ApplicationTypeVersion="1.0.0" xmlns="http://schemas.microsoft.com/2011/01/fabric">
-  <Parameters />
-  <DefaultServices />
+  <Parameters>
+    <Parameter Name="DependencyInjectionActorSampleActorService_PartitionCount" DefaultValue="3" />
+    <Parameter Name="DependencyInjectionActorSampleActorService_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="DependencyInjectionActorSampleActorService_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="DependencyInjectionActorSample1ActorService_PartitionCount" DefaultValue="3" />
+    <Parameter Name="DependencyInjectionActorSample1ActorService_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="DependencyInjectionActorSample1ActorService_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="MyTestActorService_PartitionCount" DefaultValue="3" />
+    <Parameter Name="MyTestActorService_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="MyTestActorService_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="MySecondTestActorService_PartitionCount" DefaultValue="3" />
+    <Parameter Name="MySecondTestActorService_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="MySecondTestActorService_TargetReplicaSetSize" DefaultValue="3" />
+  </Parameters>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="DotNetCoreActorExamplePkg" ServiceManifestVersion="1.0.0" />
+  </ServiceManifestImport>
+  <DefaultServices>
+    <Service Name="DependencyInjectionActorSampleActorService" GeneratedIdRef="31caf050-7e68-4600-99a0-bc90f839599e|Persisted">
+      <StatefulService ServiceTypeName="DependencyInjectionActorSampleActorServiceType" TargetReplicaSetSize="[DependencyInjectionActorSampleActorService_TargetReplicaSetSize]" MinReplicaSetSize="[DependencyInjectionActorSampleActorService_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[DependencyInjectionActorSampleActorService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+    <Service Name="DependencyInjectionActorSample1ActorService" GeneratedIdRef="7041cb85-4a81-4ad4-b106-76a08dfc0b9a|Persisted">
+      <StatefulService ServiceTypeName="DependencyInjectionActorSample1ActorServiceType" TargetReplicaSetSize="[DependencyInjectionActorSample1ActorService_TargetReplicaSetSize]" MinReplicaSetSize="[DependencyInjectionActorSample1ActorService_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[DependencyInjectionActorSample1ActorService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+    <Service Name="MyTestActorService" GeneratedIdRef="7ab63252-1bd1-4f90-a5e5-022332f2b022|Persisted">
+      <StatefulService ServiceTypeName="MyTestActorServiceType" TargetReplicaSetSize="[MyTestActorService_TargetReplicaSetSize]" MinReplicaSetSize="[MyTestActorService_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[MyTestActorService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+    <Service Name="MySecondTestActorService" GeneratedIdRef="54997cb3-7c5f-451c-aaf4-2e4670d298df|Persisted">
+      <StatefulService ServiceTypeName="MySecondTestActorServiceType" TargetReplicaSetSize="[MySecondTestActorService_TargetReplicaSetSize]" MinReplicaSetSize="[MySecondTestActorService_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[MySecondTestActorService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+  </DefaultServices>
 </ApplicationManifest>

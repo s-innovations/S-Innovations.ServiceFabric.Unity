@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.Practices.ObjectBuilder2;
-using Microsoft.Practices.Unity;
-using Microsoft.Practices.Unity.Utility;
+using ObjectBuilder2;
+using Unity;
+
 
 namespace SInnovations.ServiceFabric.Unity
 {

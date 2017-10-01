@@ -9,27 +9,30 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <IsServiceFabricServiceProject>True</IsServiceFabricServiceProject>
+    <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\S-Innovations.ServiceFabric.Unity\S-Innovations.ServiceFabric.Unity.csproj" />
+    <ProjectReference Include="..\..\src\S-Innovations.Unity.AspNetCore2\S-Innovations.Unity.AspNetCore2.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="1.1.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
     <PackageReference Include="Serilog.Sinks.Trace" Version="2.1.0" />
-    <PackageReference Include="Serilog.Extensions.Logging" Version="1.4.0" />
-    <PackageReference Include="Unity" Version="4.0.1" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="2.0.2" />
+    <PackageReference Include="Unity" Version="5.0.0-beta" />
     <PackageReference Include="Microsoft.ServiceFabric" Version="6.0.211" />
     <PackageReference Include="Microsoft.ServiceFabric.Data" Version="2.8.211" />
     <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="2.8.211" />
     <PackageReference Include="Microsoft.ServiceFabric.Services" Version="2.8.211" />
   </ItemGroup>
 
-  <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">
-    <!--<Exec Command="cmd /c copy ..\..\packages\Microsoft.ServiceFabric.Actors.2.2.207\build\FabActUtil.exe .\bin\Debug\net452\win7-x64\FabActUtil.exe" />
-    <Exec Command=".\bin\Debug\net452\win7-x64\FabActUtil.exe /spp:PackageRoot /t:manifest /sp:DotNetCoreActorExample /in:.\bin\Debug\net452\win7-x64\DotNetCoreActorExample.exe" />
-    <Exec Command="cmd /c del .\bin\Debug\net452\win7-x64\FabActUtil.exe" />-->
+  <Target Name="PrepublishScript" BeforeTargets="AfterRebuild">
+    <Exec Command="cmd /c copy ..\..\packages\Microsoft.ServiceFabric.Actors.2.8.211\build\FabActUtil.exe .\bin\x64\Debug\net462\win7-x64\FabActUtil.exe" />
+    <Exec Command=".\bin\x64\Debug\net462\win7-x64\FabActUtil.exe /spp:PackageRoot /app:../DependencyInjectionSample/ApplicationPackageRoot /local1nodeappparamfile:../DependencyInjectionSample/ApplicationParameters/Local.1Node.xml /local5nodeappparamfile:../DependencyInjectionSample/ApplicationParameters/Local.5Node.xml /t:manifest /sp:DotNetCoreActorExample /in:.\bin\x64\Debug\net462\win7-x64\DotNetCoreActorExample.exe" />
+    <!--<Exec Command="cmd /c del .\bin\x64\Debug\net462\win7-x64\FabActUtil.exe" />-->
   </Target>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">

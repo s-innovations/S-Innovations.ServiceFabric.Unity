@@ -1,6 +1,6 @@
-﻿using Microsoft.Practices.ObjectBuilder2;
-using Microsoft.Practices.Unity;
-using Microsoft.Practices.Unity.ObjectBuilder;
+﻿using ObjectBuilder2;
+using Unity;
+using Unity.ObjectBuilder;
 using System;
 using System.Collections.Generic;
 using System.Linq;

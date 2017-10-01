@@ -1,4 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Application xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Name="fabric:/DependencyInjectionSample" xmlns="http://schemas.microsoft.com/2011/01/fabric">
-  <Parameters />
+  <Parameters>
+    <Parameter Name="DependencyInjectionActorSampleActorService_PartitionCount" Value="1" />
+    <Parameter Name="DependencyInjectionActorSample1ActorService_PartitionCount" Value="1" />
+    <Parameter Name="MyTestActorService_PartitionCount" Value="1" />
+    <Parameter Name="MySecondTestActorService_PartitionCount" Value="1" />
+  </Parameters>
 </Application>
