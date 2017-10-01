@@ -7,6 +7,8 @@
     <OutputType>Exe</OutputType>
     <PackageId>DependencyInjectionServiceSample</PackageId>
     <IsServiceFabricServiceProject>True</IsServiceFabricServiceProject>
+    <Platforms>AnyCPU;x64</Platforms>
+    <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup>
@@ -48,10 +50,10 @@
 
   </ItemGroup>
 
-  <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">
+  <!--<Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">
     <Exec Command="bower install" />
     <Exec Command="dotnet bundle" />
-  </Target>
+  </Target>-->
 
   <ItemGroup>
     <DotNetCliToolReference Include="BundlerMinifier.Core" Version="2.2.301" />

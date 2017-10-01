@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.3
+VisualStudioVersion = 15.0.26823.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{A1C3DC73-B8FC-482E-AE85-C372871D4B9B}"
 EndProject
@@ -29,7 +29,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "S-Innovations.Unity.AspNetC
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{18DE4556-C941-462C-8EB4-3EEC9D3F09E0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S-Innovations.ServiceFabric.Unity.UnitTests", "test\S-Innovations.ServiceFabric.Unity.UnitTests\S-Innovations.ServiceFabric.Unity.UnitTests.csproj", "{5A1565C0-B374-4325-BAA3-0CECD67ED52D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "S-Innovations.ServiceFabric.Unity.UnitTests", "test\S-Innovations.ServiceFabric.Unity.UnitTests\S-Innovations.ServiceFabric.Unity.UnitTests.csproj", "{5A1565C0-B374-4325-BAA3-0CECD67ED52D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,8 +57,8 @@ Global
 		{C7A289DA-5AB4-468F-8963-EED3379AE152}.Release|x64.Deploy.0 = Release|x64
 		{E2ECC36A-84C8-4B04-8DE9-1F6EBF6BE5DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E2ECC36A-84C8-4B04-8DE9-1F6EBF6BE5DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E2ECC36A-84C8-4B04-8DE9-1F6EBF6BE5DB}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{E2ECC36A-84C8-4B04-8DE9-1F6EBF6BE5DB}.Debug|x64.Build.0 = Debug|Any CPU
+		{E2ECC36A-84C8-4B04-8DE9-1F6EBF6BE5DB}.Debug|x64.ActiveCfg = Debug|x64
+		{E2ECC36A-84C8-4B04-8DE9-1F6EBF6BE5DB}.Debug|x64.Build.0 = Debug|x64
 		{E2ECC36A-84C8-4B04-8DE9-1F6EBF6BE5DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E2ECC36A-84C8-4B04-8DE9-1F6EBF6BE5DB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E2ECC36A-84C8-4B04-8DE9-1F6EBF6BE5DB}.Release|x64.ActiveCfg = Release|Any CPU
@@ -77,8 +77,8 @@ Global
 		{2F8EF6DA-2E14-4608-AE4E-A1E8BB95993A}.Release|x64.Build.0 = Release|x64
 		{F797A7E3-E06D-4A24-BB6A-9273F205C574}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F797A7E3-E06D-4A24-BB6A-9273F205C574}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F797A7E3-E06D-4A24-BB6A-9273F205C574}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{F797A7E3-E06D-4A24-BB6A-9273F205C574}.Debug|x64.Build.0 = Debug|Any CPU
+		{F797A7E3-E06D-4A24-BB6A-9273F205C574}.Debug|x64.ActiveCfg = Debug|x64
+		{F797A7E3-E06D-4A24-BB6A-9273F205C574}.Debug|x64.Build.0 = Debug|x64
 		{F797A7E3-E06D-4A24-BB6A-9273F205C574}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F797A7E3-E06D-4A24-BB6A-9273F205C574}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F797A7E3-E06D-4A24-BB6A-9273F205C574}.Release|x64.ActiveCfg = Release|Any CPU

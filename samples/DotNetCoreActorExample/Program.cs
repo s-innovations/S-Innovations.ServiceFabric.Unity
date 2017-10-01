@@ -5,12 +5,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Practices.Unity;
+using Unity;
 using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Client;
 using Microsoft.ServiceFabric.Actors.Runtime;
 using Serilog;
 using SInnovations.ServiceFabric.Unity;
+using SInnovations.Unity.AspNetCore;
 
 namespace DependencyInjectionActorSample
 {
@@ -203,6 +204,33 @@ namespace DependencyInjectionActorSample
         }
     }
 
+    //public class FabricContainer : UnityContainer, IServiceScopeInitializer
+    //{
+
+    //    public FabricContainer()
+    //    {
+    //        this.RegisterInstance<IServiceScopeInitializer>(this);
+    //        this.AsFabricContainer();
+    //    }
+    //    public IUnityContainer InitializeScope(IUnityContainer container)
+    //    {
+    //        return container.WithExtension();
+    //    }
+    //}
+
+    public class FabricContainer : UnityContainer, IServiceScopeInitializer
+    {
+
+        public FabricContainer()
+        {
+            this.RegisterInstance<IServiceScopeInitializer>(this);
+            this.AsFabricContainer();
+        }
+        public IUnityContainer InitializeScope(IUnityContainer container)
+        {
+            return container.WithExtension();
+        }
+    }
 
     internal static class Program
     {
@@ -224,7 +252,7 @@ namespace DependencyInjectionActorSample
                  .CreateLogger();
 
 
-                using (var container = new UnityContainer().AsFabricContainer())
+                using (var container = new FabricContainer())
                 {
                     var loggerfac = new LoggerFactory() as ILoggerFactory;
                     loggerfac.AddSerilog();

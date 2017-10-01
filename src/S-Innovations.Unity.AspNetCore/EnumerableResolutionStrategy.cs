@@ -1,12 +1,13 @@
-﻿using Microsoft.Practices.ObjectBuilder2;
-using Microsoft.Practices.Unity;
-using Microsoft.Practices.Unity.Utility;
+﻿
+using ObjectBuilder2;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Unity;
+using Unity.Utility;
 
 namespace SInnovations.Unity.AspNetCore
 {
@@ -15,11 +16,11 @@ namespace SInnovations.Unity.AspNetCore
         private delegate object Resolver(IBuilderContext context, IUnityContainer container);
 
         private static readonly MethodInfo GenericResolveEnumerableMethod =
-            typeof(EnumerableResolutionStrategy).GetMethod("ResolveEnumerable",
+            typeof(EnumerableResolutionStrategy).GetMethod(nameof(EnumerableResolutionStrategy.ResolveEnumerable),
                 BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
         private static readonly MethodInfo GenericResolveLazyEnumerableMethod =
-            typeof(EnumerableResolutionStrategy).GetMethod("ResolveLazyEnumerable",
+            typeof(EnumerableResolutionStrategy).GetMethod(nameof(EnumerableResolutionStrategy.ResolveLazyEnumerable),
                 BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
         /// <summary>
@@ -53,7 +54,8 @@ namespace SInnovations.Unity.AspNetCore
                 resolverMethod = GenericResolveEnumerableMethod.MakeGenericMethod(typeToBuild);
             }
 
-            var resolver = (Resolver)Delegate.CreateDelegate(typeof(Resolver), resolverMethod);
+            //  var resolver = (Resolver)MethodInfo.CreateDelegate(typeof(Resolver), resolverMethod);
+            var resolver =(Resolver) resolverMethod.CreateDelegate(typeof(Resolver), null);
             context.Existing = resolver(context, container);
             context.BuildComplete = true;
         }
@@ -65,12 +67,12 @@ namespace SInnovations.Unity.AspNetCore
 
         private static bool IsResolvingIEnumerable(Type type)
         {
-            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>);
+            return type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>);
         }
 
         private static bool IsResolvingLazy(Type type)
         {
-            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Lazy<>);
+            return type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == typeof(Lazy<>);
         }
 
         private static object ResolveLazyEnumerable<T>(IBuilderContext context, IUnityContainer container)
@@ -95,8 +97,8 @@ namespace SInnovations.Unity.AspNetCore
         private static IEnumerable<object> ResolveAll(IUnityContainer container, Type type, Type typeWrapper)
         {
             var names = GetRegisteredNames(container, type);
-
-            if (type.IsGenericType)
+           
+            if (type.GetTypeInfo().IsGenericType)
             {
                 var childType = type.GetGenericTypeDefinition();
                 names = names.Concat(GetRegisteredNames(container, childType));

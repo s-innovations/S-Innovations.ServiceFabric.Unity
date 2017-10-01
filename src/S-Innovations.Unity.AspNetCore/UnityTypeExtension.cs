@@ -1,9 +1,10 @@
-﻿using Microsoft.Practices.Unity;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Unity;
 
 namespace SInnovations.Unity.AspNetCore
 {
@@ -11,14 +12,17 @@ namespace SInnovations.Unity.AspNetCore
     {
         public static bool CanResolve(this IUnityContainer container, Type type)
         {
-            if (type.IsClass)
+            var typeInfo = type.GetTypeInfo();
+
+            if (typeInfo.IsClass)
                 return true;
 
-            if (type.IsGenericType)
+           
+            if (typeInfo.IsGenericType)
             {
                 var gerericType = type.GetGenericTypeDefinition();
                 if (gerericType == typeof(IEnumerable<>) ||
-                    gerericType.IsClass ||
+                    gerericType.GetTypeInfo().IsClass ||
                     container.IsRegistered(gerericType))
                 {
                     return true;

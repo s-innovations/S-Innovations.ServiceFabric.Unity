@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Practices.Unity;
+using Unity;
 using SInnovations.ServiceFabric.Unity;
 using Microsoft.ServiceFabric.Actors.Runtime;
 using Microsoft.ServiceFabric.Actors;

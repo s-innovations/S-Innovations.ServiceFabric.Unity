@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net462</TargetFrameworks>
+    <TargetFrameworks>net462;net452;netstandard2.0</TargetFrameworks>
     <AssemblyName>S-Innovations.ServiceFabric.Unity</AssemblyName>
     <PackageId>S-Innovations.ServiceFabric.Unity</PackageId>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
@@ -14,10 +14,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.ServiceFabric" Version="6.1.211-preview" />
     <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="3.0.211-preview" />
     <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.0.211-preview" />
     <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
-    <PackageReference Include="Unity" Version="4.0.1" />
+    <PackageReference Include="Unity" Version="5.0.0-beta" />
   </ItemGroup>
 
   <ItemGroup>

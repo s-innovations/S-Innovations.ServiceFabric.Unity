@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using DependencyInjectionActorSample.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Practices.Unity;
+using Unity;
 using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Client;
 using Microsoft.ServiceFabric.Actors.Runtime;
@@ -176,7 +176,8 @@ namespace DependencyInjectionActorSample
                  .WriteTo.Trace()
                  .CreateLogger();
 
-
+      
+              //  FabricRuntime.Create().registera
                 using (var container = new UnityContainer().AsFabricContainer())
                 {
                     var loggerfac = new LoggerFactory() as ILoggerFactory;
@@ -184,7 +185,10 @@ namespace DependencyInjectionActorSample
                     container.RegisterInstance(loggerfac);
 
                     container.RegisterType<IMyScopedDependency, MyScopedDependency>(new HierarchicalLifetimeManager());
-                    
+
+                   // ActorRuntime.RegisterActorAsync<MyTestActor>((c, type) => new ActorService(c, type, settings: new ActorServiceSettings { }));
+
+
                     container.WithActor<MyTestActor>(new ActorServiceSettings()
                     {
                         ActorGarbageCollectionSettings = new ActorGarbageCollectionSettings(120, 60)
@@ -199,11 +203,11 @@ namespace DependencyInjectionActorSample
                     {
                         ActorGarbageCollectionSettings = new ActorGarbageCollectionSettings(300, 100)
                     });
-
+               
                     Task.Delay(15000).ContinueWith(async (task) =>
                     {
                         await ActorProxy.Create<IMyTestActor>(new ActorId("MyCoolActor")).StartAsync();
-
+                  
                         
 
                     }).Wait();

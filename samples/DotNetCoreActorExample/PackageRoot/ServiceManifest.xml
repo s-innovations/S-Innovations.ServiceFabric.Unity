@@ -6,11 +6,11 @@
         <Extension Name="__GeneratedServiceType__" GeneratedId="31caf050-7e68-4600-99a0-bc90f839599e|Persisted">
           <GeneratedNames xmlns="http://schemas.microsoft.com/2015/03/fabact-no-schema">
             <DefaultService Name="DependencyInjectionActorSampleActorService" />
-            <ServiceEndpoint Name="DependencyInjectionActorSampleActorServiceEndpoint" />
             <ReplicatorEndpoint Name="DependencyInjectionActorSampleActorServiceReplicatorEndpoint" />
             <ReplicatorConfigSection Name="DependencyInjectionActorSampleActorServiceReplicatorConfig" />
             <ReplicatorSecurityConfigSection Name="DependencyInjectionActorSampleActorServiceReplicatorSecurityConfig" />
             <StoreConfigSection Name="DependencyInjectionActorSampleActorServiceLocalStoreConfig" />
+            <ServiceEndpoint Name="DependencyInjectionActorSampleActorServiceEndpoint" />
           </GeneratedNames>
         </Extension>
       </Extensions>
@@ -20,11 +20,11 @@
         <Extension Name="__GeneratedServiceType__" GeneratedId="7ab63252-1bd1-4f90-a5e5-022332f2b022|Persisted">
           <GeneratedNames xmlns="http://schemas.microsoft.com/2015/03/fabact-no-schema">
             <DefaultService Name="MyTestActorService" />
-            <ServiceEndpoint Name="MyTestActorServiceEndpoint" />
             <ReplicatorEndpoint Name="MyTestActorServiceReplicatorEndpoint" />
             <ReplicatorConfigSection Name="MyTestActorServiceReplicatorConfig" />
             <ReplicatorSecurityConfigSection Name="MyTestActorServiceReplicatorSecurityConfig" />
             <StoreConfigSection Name="MyTestActorServiceLocalStoreConfig" />
+            <ServiceEndpoint Name="MyTestActorServiceEndpoint" />
           </GeneratedNames>
         </Extension>
       </Extensions>
@@ -34,11 +34,11 @@
         <Extension Name="__GeneratedServiceType__" GeneratedId="54997cb3-7c5f-451c-aaf4-2e4670d298df|Persisted">
           <GeneratedNames xmlns="http://schemas.microsoft.com/2015/03/fabact-no-schema">
             <DefaultService Name="MySecondTestActorService" />
-            <ServiceEndpoint Name="MySecondTestActorServiceEndpoint" />
             <ReplicatorEndpoint Name="MySecondTestActorServiceReplicatorEndpoint" />
             <ReplicatorConfigSection Name="MySecondTestActorServiceReplicatorConfig" />
             <ReplicatorSecurityConfigSection Name="MySecondTestActorServiceReplicatorSecurityConfig" />
             <StoreConfigSection Name="MySecondTestActorServiceLocalStoreConfig" />
+            <ServiceEndpoint Name="MySecondTestActorServiceEndpoint" />
           </GeneratedNames>
         </Extension>
       </Extensions>
@@ -48,11 +48,11 @@
         <Extension Name="__GeneratedServiceType__" GeneratedId="7041cb85-4a81-4ad4-b106-76a08dfc0b9a|Persisted">
           <GeneratedNames xmlns="http://schemas.microsoft.com/2015/03/fabact-no-schema">
             <DefaultService Name="DependencyInjectionActorSample1ActorService" />
-            <ServiceEndpoint Name="DependencyInjectionActorSample1ActorServiceEndpoint" />
             <ReplicatorEndpoint Name="DependencyInjectionActorSample1ActorServiceReplicatorEndpoint" />
             <ReplicatorConfigSection Name="DependencyInjectionActorSample1ActorServiceReplicatorConfig" />
             <ReplicatorSecurityConfigSection Name="DependencyInjectionActorSample1ActorServiceReplicatorSecurityConfig" />
             <StoreConfigSection Name="DependencyInjectionActorSample1ActorServiceLocalStoreConfig" />
+            <ServiceEndpoint Name="DependencyInjectionActorSample1ActorServiceEndpoint" />
           </GeneratedNames>
         </Extension>
       </Extensions>

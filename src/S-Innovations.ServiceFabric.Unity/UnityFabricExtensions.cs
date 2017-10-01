@@ -1,6 +1,4 @@
-﻿using Microsoft.Practices.ObjectBuilder2;
-using Microsoft.Practices.Unity;
-using Microsoft.Practices.Unity.ObjectBuilder;
+﻿
 using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
@@ -9,6 +7,7 @@ using System.Fabric;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using Unity;
 
 namespace SInnovations.ServiceFabric.Unity
 {

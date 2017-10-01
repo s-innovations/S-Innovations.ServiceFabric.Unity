@@ -1,6 +1,7 @@
-using Microsoft.Practices.Unity;
+using Unity;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SInnovations.Unity.AspNetCore;
+using Unity;
 
 namespace SInnovations.ServiceFabric.Unity.UnitTests
 {

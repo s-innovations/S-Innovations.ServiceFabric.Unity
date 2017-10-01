@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net462</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
     <AssemblyName>DotNetCoreActorExample</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageId>DotNetCoreActorExample</PackageId>
@@ -9,30 +9,53 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <IsServiceFabricServiceProject>True</IsServiceFabricServiceProject>
+    <Platforms>AnyCPU;x64</Platforms>
+    <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
+     
+   
+    <!--<UpdateServiceFabricManifestEnabled>true</UpdateServiceFabricManifestEnabled>
+    <ServicePackagePath>PackageRoot</ServicePackagePath>
+    <ServicePackagePrefix>DotNetCoreActorExample</ServicePackagePrefix>-->
+    <!--<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>-->
   </PropertyGroup>
-
+ 
+  
   <ItemGroup>
     <ProjectReference Include="..\..\src\S-Innovations.ServiceFabric.Unity\S-Innovations.ServiceFabric.Unity.csproj" />
+    <ProjectReference Include="..\..\src\S-Innovations.Unity.AspNetCore2\S-Innovations.Unity.AspNetCore2.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="1.1.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
     <PackageReference Include="Serilog.Sinks.Trace" Version="2.1.0" />
-    <PackageReference Include="Serilog.Extensions.Logging" Version="1.4.0" />
-    <PackageReference Include="Unity" Version="4.0.1" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="2.0.2" />
+    <PackageReference Include="Unity" Version="5.0.0-beta" />
     <PackageReference Include="Microsoft.ServiceFabric" Version="6.1.211-preview" />
     <PackageReference Include="Microsoft.ServiceFabric.Data" Version="3.0.211-preview" />
     <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="3.0.211-preview" />
     <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.0.211-preview" />
   </ItemGroup>
 
-  <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">
-    <!--<Exec Command="cmd /c copy ..\..\packages\Microsoft.ServiceFabric.Actors.2.2.207\build\FabActUtil.exe .\bin\Debug\net452\win7-x64\FabActUtil.exe" />
-    <Exec Command=".\bin\Debug\net452\win7-x64\FabActUtil.exe /spp:PackageRoot /t:manifest /sp:DotNetCoreActorExample /in:.\bin\Debug\net452\win7-x64\DotNetCoreActorExample.exe" />
-    <Exec Command="cmd /c del .\bin\Debug\net452\win7-x64\FabActUtil.exe" />-->
+  <Target Name="PrepublishScript" BeforeTargets="AfterRebuild">
+    <Exec Command="cmd /c copy ..\..\packages\Microsoft.ServiceFabric.Actors.3.0.211-preview\build\FabActUtil.exe .\bin\x64\Debug\net462\win7-x64\FabActUtil.exe" />
+    <Exec Command=".\bin\x64\Debug\net462\win7-x64\FabActUtil.exe /spp:PackageRoot /t:manifest /arp:.\bin\x64\Debug\net462\win7-x64\ /sp:DotNetCoreActorExample /in:.\bin\x64\Debug\net462\win7-x64\DotNetCoreActorExample.exe /app:..\DependencyInjectionSample\ApplicationPackageRoot" />
+    <Exec Command="cmd /c del .\bin\x64\Debug\net462\win7-x64\FabActUtil.exe" />
+
+    <!--<Exec Command="dotnet fabutil /spp:PackageRoot /t:manifest /arp:.\bin\x64\Debug\netcoreapp2.0\win7-x64\ /sp:DotNetCoreActorExample /in:.\bin\x64\Debug\netcoreapp2.0\win7-x64\DotNetCoreActorExample.dll /app:..\DependencyInjectionSample\ApplicationPackageRoot"></Exec>-->
   </Target>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
   </ItemGroup>
 
+
+  <ItemGroup>
+    <DotNetCliToolReference Include="S-Innovations.ServiceFabric.CoreCLR.Tools.FabUtil" Version="1.0.0-pre-2017093002" />
+  </ItemGroup>
+  <!--<Import Project="..\..\packages\Microsoft.ServiceFabric.Actors.3.0.211-preview\build\Microsoft.ServiceFabric.Actors.targets" Condition="Exists('..\packages\Microsoft.ServiceFabric.Actors.3.0.211-preview\build\Microsoft.ServiceFabric.Actors.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\packages\Microsoft.ServiceFabric.Actors.3.0.211-preview\build\Microsoft.ServiceFabric.Actors.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.ServiceFabric.Actors.3.0.211-preview\build\Microsoft.ServiceFabric.Actors.targets'))" />
+  </Target>-->
 </Project>

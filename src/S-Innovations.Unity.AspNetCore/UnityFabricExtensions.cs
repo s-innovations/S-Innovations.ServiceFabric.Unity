@@ -2,12 +2,13 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.Practices.Unity;
+using Unity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Unity;
 
 namespace SInnovations.Unity.AspNetCore
 {
@@ -81,7 +82,7 @@ namespace SInnovations.Unity.AspNetCore
                             .RegisterType(typeof(IOptionsMonitor<>), typeof(OptionsMonitor<>), new ContainerControlledLifetimeManager());
 #endif
 
-#if NETSTANDARD2_0
+#if NETSTANDARD2_0 || NET462
             return container.RegisterType(typeof(IOptions<>), typeof(OptionsManager<>), new ContainerControlledLifetimeManager())
                 .RegisterType(typeof(IOptionsSnapshot<>), typeof(OptionsManager<>), new HierarchicalLifetimeManager())
            .RegisterType(typeof(IOptionsMonitor<>), typeof(OptionsMonitor<>), new ContainerControlledLifetimeManager())
