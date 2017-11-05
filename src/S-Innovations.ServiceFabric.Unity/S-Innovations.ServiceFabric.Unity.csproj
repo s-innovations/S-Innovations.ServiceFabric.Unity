@@ -14,12 +14,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="2.8.211" />
-    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="2.8.211" />
+    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="2.8.219" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="2.8.219" />
     <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
-    <PackageReference Include="Unity" Version="5.0.0-beta" />
+    <PackageReference Include="Unity" Version="5.1.2" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
+    <PackageReference Include="Unity.Container">
+      <Version>5.1.0</Version>
+    </PackageReference>
   </ItemGroup>
 </Project>

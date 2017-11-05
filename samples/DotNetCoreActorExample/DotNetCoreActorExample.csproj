@@ -22,18 +22,14 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
     <PackageReference Include="Serilog.Sinks.Trace" Version="2.1.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="2.0.2" />
-    <PackageReference Include="Unity" Version="5.0.0-beta" />
-    <PackageReference Include="Microsoft.ServiceFabric" Version="6.0.211" />
-    <PackageReference Include="Microsoft.ServiceFabric.Data" Version="2.8.211" />
-    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="2.8.211" />
-    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="2.8.211" />
+    <PackageReference Include="Unity" Version="5.1.2" />
   </ItemGroup>
 
-  <Target Name="PrepublishScript" BeforeTargets="AfterRebuild">
+  <!--<Target Name="PrepublishScript" BeforeTargets="AfterRebuild">
     <Exec Command="cmd /c copy ..\..\packages\Microsoft.ServiceFabric.Actors.2.8.211\build\FabActUtil.exe .\bin\x64\Debug\net462\win7-x64\FabActUtil.exe" />
     <Exec Command=".\bin\x64\Debug\net462\win7-x64\FabActUtil.exe /spp:PackageRoot /app:../DependencyInjectionSample/ApplicationPackageRoot /local1nodeappparamfile:../DependencyInjectionSample/ApplicationParameters/Local.1Node.xml /local5nodeappparamfile:../DependencyInjectionSample/ApplicationParameters/Local.5Node.xml /t:manifest /sp:DotNetCoreActorExample /in:.\bin\x64\Debug\net462\win7-x64\DotNetCoreActorExample.exe" />
-    <!--<Exec Command="cmd /c del .\bin\x64\Debug\net462\win7-x64\FabActUtil.exe" />-->
-  </Target>
+    --><!--<Exec Command="cmd /c del .\bin\x64\Debug\net462\win7-x64\FabActUtil.exe" />--><!--
+  </Target>-->
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
   </ItemGroup>

@@ -12,6 +12,7 @@ using Microsoft.ServiceFabric.Actors.Runtime;
 using Serilog;
 using SInnovations.ServiceFabric.Unity;
 using SInnovations.Unity.AspNetCore;
+using Unity.Lifetime;
 
 namespace DependencyInjectionActorSample
 {

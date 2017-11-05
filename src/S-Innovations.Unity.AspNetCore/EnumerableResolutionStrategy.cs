@@ -1,13 +1,12 @@
-﻿using ObjectBuilder2;
-using Unity;
-
+﻿
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Unity.Utility;
+using Unity;
+using Unity.Builder;
+using Unity.Builder.Strategy;
+using Unity.Registration;
 
 namespace SInnovations.Unity.AspNetCore
 {
@@ -29,7 +28,7 @@ namespace SInnovations.Unity.AspNetCore
         /// <param name="context">Current build context.</param>
         public override void PreBuildUp(IBuilderContext context)
         {
-            Guard.ArgumentNotNull(context, "context");
+          //  Guard.ArgumentNotNull(context, "context");
 
             if (!IsResolvingIEnumerable(context.BuildKey.Type))
             {
@@ -108,7 +107,7 @@ namespace SInnovations.Unity.AspNetCore
                 .Select(name => container.Resolve(typeWrapper, name)).Reverse();
         }
 
-        private static IEnumerable<ContainerRegistration> GetRegisteredNames(IUnityContainer container, Type type)
+        private static IEnumerable<IContainerRegistration> GetRegisteredNames(IUnityContainer container, Type type)
         {
             return container.Registrations.Where(t => t.RegisteredType == type);
         }

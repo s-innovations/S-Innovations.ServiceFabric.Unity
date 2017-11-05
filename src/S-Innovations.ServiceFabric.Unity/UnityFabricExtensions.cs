@@ -1,19 +1,17 @@
-﻿using ObjectBuilder2;
-using Unity;
-using Unity.ObjectBuilder;
-using Microsoft.ServiceFabric.Actors;
+﻿using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using System;
 using System.Fabric;
-using System.Linq;
-using System.Reflection;
 using System.Threading;
+using Unity;
+using Unity.Injection;
+using Unity.Lifetime;
 
 namespace SInnovations.ServiceFabric.Unity
 {
 
-  
+
     public interface IServiceScopeInitializer
     {
         IUnityContainer InitializeScope(IUnityContainer container);
