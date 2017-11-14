@@ -1,7 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net462</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <IsServiceFabricServiceProject>True</IsServiceFabricServiceProject>
+    <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
+    
     <AssemblyName>DotNetCoreActorExample</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageId>DotNetCoreActorExample</PackageId>
@@ -9,8 +12,6 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <IsServiceFabricServiceProject>True</IsServiceFabricServiceProject>
-    <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
-    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,7 +23,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
     <PackageReference Include="Serilog.Sinks.Trace" Version="2.1.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="2.0.2" />
-    <PackageReference Include="Unity" Version="5.1.2" />
+    <PackageReference Include="Unity" Version="5.2.0" />
   </ItemGroup>
 
   <!--<Target Name="PrepublishScript" BeforeTargets="AfterRebuild">
@@ -31,7 +32,11 @@
     --><!--<Exec Command="cmd /c del .\bin\x64\Debug\net462\win7-x64\FabActUtil.exe" />--><!--
   </Target>-->
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
+  <Target Name="MyPostBuildTarget" AfterTargets="AfterRebuild">
+    <Exec Command="dotnet fabutil /spp:PackageRoot /t:manifest /sp:$(AssemblyName)  /local1nodeappparamfile:../DependencyInjectionSample/ApplicationParameters/Local.1Node.xml     /local5nodeappparamfile:../DependencyInjectionSample/ApplicationParameters/Local.5Node.xml   /app:../DependencyInjectionSample/ApplicationPackageRoot /in:./$(OutputPath)$(AssemblyName).exe /arp:./$(OutputPath.TrimEnd('\'))" />
+  </Target>
+  <ItemGroup>
+    <DotNetCliToolReference Include="S-Innovations.ServiceFabric.CoreCLR.Tools.FabUtil" Version="1.0.0-pre-2017110501" />
   </ItemGroup>
-
+  
 </Project>
