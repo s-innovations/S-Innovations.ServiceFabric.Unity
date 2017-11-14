@@ -36,7 +36,7 @@
     <Exec Command="dotnet fabutil /spp:PackageRoot /t:manifest /sp:$(AssemblyName)  /local1nodeappparamfile:../DependencyInjectionSample/ApplicationParameters/Local.1Node.xml     /local5nodeappparamfile:../DependencyInjectionSample/ApplicationParameters/Local.5Node.xml   /app:../DependencyInjectionSample/ApplicationPackageRoot /in:./$(OutputPath)$(AssemblyName).exe /arp:./$(OutputPath.TrimEnd('\'))" />
   </Target>
   <ItemGroup>
-    <DotNetCliToolReference Include="S-Innovations.ServiceFabric.CoreCLR.Tools.FabUtil" Version="1.0.0-pre-2017110501" />
+    <DotNetCliToolReference Include="S-Innovations.ServiceFabric.CoreCLR.Tools.FabUtil" Version="1.0.0-pre-2017111406" />
   </ItemGroup>
   
 </Project>
