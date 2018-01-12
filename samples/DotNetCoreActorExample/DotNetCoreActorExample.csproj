@@ -23,7 +23,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
     <PackageReference Include="Serilog.Sinks.Trace" Version="2.1.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="2.0.2" />
-    <PackageReference Include="Unity" Version="5.2.0" />
+    <PackageReference Include="Unity" Version="5.5.5" />
   </ItemGroup>
 
   <!--<Target Name="PrepublishScript" BeforeTargets="AfterRebuild">

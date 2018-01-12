@@ -106,9 +106,9 @@ namespace SInnovations.Unity.AspNetCore
             /// </summary>
             class ParameterResolver : DefaultUnityConstructorSelectorPolicy
             {
-                public IDependencyResolverPolicy GetResolver(ParameterInfo parameterInfo)
+                public IResolverPolicy GetResolver(ParameterInfo parameterInfo)
                 {
-               
+            
                     return CreateResolver(parameterInfo);
                 }
             }
@@ -144,11 +144,11 @@ namespace SInnovations.Unity.AspNetCore
                 return new SelectedConstructor(newCtor);
             }
         }
-        public override void PreBuildUp(IBuilderContext context)
+        public override object PreBuildUp(IBuilderContext context)
         {
             if (context.Existing != null)
             {
-                return;
+                return base.PreBuildUp(context);
             }
 
 
@@ -160,6 +160,8 @@ namespace SInnovations.Unity.AspNetCore
                 new DerivedTypeConstructorSelectorPolicy(
                     GetUnityFromBuildContext(context), originalSelectorPolicy),
                 context.BuildKey);
+
+            return base.PreBuildUp(context);
 
         }
 

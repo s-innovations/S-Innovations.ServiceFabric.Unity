@@ -9,7 +9,7 @@ namespace SInnovations.Unity.AspNetCore
         protected override void Initialize()
         {
             // Enumerable strategy
-            Context.Strategies.AddNew<EnumerableResolutionStrategy>(
+            Context.Strategies.Add(new EnumerableResolutionStrategy(),
                 UnityBuildStage.TypeMapping);
 
         }

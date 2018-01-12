@@ -30,9 +30,9 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.0.0" />
-    <PackageReference Include="Unity" Version="5.2.0" />
+    <PackageReference Include="Unity" Version="5.5.5" />
     <PackageReference Include="Unity.Container">
-      <Version>5.2.0</Version>
+      <Version>5.5.5</Version>
     </PackageReference>
   </ItemGroup>
 
