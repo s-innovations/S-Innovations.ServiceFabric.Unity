@@ -16,7 +16,7 @@ namespace SInnovations.Unity.AspNetCore
         public static IUnityContainer Populate(this IUnityContainer container,
             IEnumerable<ServiceDescriptor> descriptors)
         {
-            container.WithExtension();
+            container.WithAspNetCoreServiceProvider();
 
           
 

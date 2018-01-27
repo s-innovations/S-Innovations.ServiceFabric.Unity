@@ -191,7 +191,7 @@ namespace SInnovations.ServiceFabric.Unity
                     var serviceContainer = container.CreateChildContainer();
                     return ActorServiceFactory(serviceContainer,  context, actorType, (service, id) =>
                                serviceContainer.CreateChildContainer()
-                                   .WithExtension()
+                                   .IntializeScope()
                                    .RegisterInstance(service.Context.CodePackageActivationContext, new ExternallyControlledLifetimeManager())
                                    .RegisterInstance(service, new ExternallyControlledLifetimeManager())
                                    .RegisterInstance(id, new ContainerControlledLifetimeManager()).Resolve<TActor>());
@@ -248,7 +248,7 @@ namespace SInnovations.ServiceFabric.Unity
         private static IUnityContainer MakeServiceContainer<T>(IUnityContainer container, T context, Action<IUnityContainer> scopeRegistrations = null) where T : ServiceContext
         {
 
-            var child = container.CreateChildContainer().WithExtension();
+            var child = container.CreateChildContainer().IntializeScope();
 
             child.RegisterInstance<ServiceContext>(context, new ExternallyControlledLifetimeManager());
             child.RegisterInstance(context.CodePackageActivationContext, new ExternallyControlledLifetimeManager());
@@ -259,7 +259,7 @@ namespace SInnovations.ServiceFabric.Unity
             return child;
         }
 
-        private static IUnityContainer WithExtension(this IUnityContainer container)
+        private static IUnityContainer IntializeScope(this IUnityContainer container)
         {
             if (container.IsRegistered<IServiceScopeInitializer>())
             {
@@ -269,4 +269,5 @@ namespace SInnovations.ServiceFabric.Unity
         }
 
     }
+
 }

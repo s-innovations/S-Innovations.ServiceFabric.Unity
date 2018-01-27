@@ -215,7 +215,7 @@ namespace DependencyInjectionActorSample
         }
         public IUnityContainer InitializeScope(IUnityContainer container)
         {
-            return container.WithExtension();
+            return container.WithAspNetCoreServiceProvider();
         }
     }
 

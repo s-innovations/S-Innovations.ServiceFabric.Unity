@@ -23,7 +23,7 @@ namespace SInnovations.ServiceFabric.Unity.UnitTests
         [TestMethod]
         public void ShouldUseDefaultValue()
         {
-            var container = new UnityContainer().WithExtension();
+            var container = new UnityContainer().WithAspNetCoreServiceProvider();
             container.Resolve<MyTestClass>();
         }
     }

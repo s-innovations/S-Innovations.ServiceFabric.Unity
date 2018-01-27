@@ -25,7 +25,7 @@ namespace SInnovations.Unity.AspNetCore
         private IUnityContainer CreateChildContainer()
         {
             return container.CreateChildContainer()
-                .WithExtension();
+                .WithAspNetCoreServiceProvider();
         }
     }
 }

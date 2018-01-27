@@ -99,12 +99,16 @@ namespace SInnovations.Unity.AspNetCore
         /// </summary>
         /// <param name="container"></param>
         /// <returns></returns>
-        public static IUnityContainer WithExtension(this IUnityContainer container)
+        public static IUnityContainer WithAspNetCoreServiceProvider(this IUnityContainer container)
         {
             container.RegisterType<IServiceProvider, UnityServiceProvider>();
             container.RegisterType<IServiceScopeFactory, UnityServiceScopeFactory>();
 
             return container.AddExtension(new EnumerableExtension()).AddExtension(new CustomBuildExtension());
         }
+
     }
+
+    
+
 }
