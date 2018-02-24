@@ -178,6 +178,9 @@ namespace SInnovations.ServiceFabric.Unity
             //var logger = container.Resolve<ILoggerFactory>().CreateLogger<TActor>();
             //logger.LogInformation("Registering Actor {ActorName}", typeof(TActor).Name);
 
+          //  container = container.IntializeScope();
+
+
             if (!container.IsRegistered<IActorDeactivationInterception>())
             {
                 container.RegisterType<IActorDeactivationInterception, OnActorDeactivateInterceptor>(new HierarchicalLifetimeManager());
@@ -188,9 +191,10 @@ namespace SInnovations.ServiceFabric.Unity
             {
                 try
                 {
-                    var serviceContainer = container.CreateChildContainer();
+                    var serviceContainer = container.IntializeScope();
+
                     return ActorServiceFactory(serviceContainer,  context, actorType, (service, id) =>
-                               serviceContainer.CreateChildContainer()
+                               serviceContainer
                                    .IntializeScope()
                                    .RegisterInstance(service.Context.CodePackageActivationContext, new ExternallyControlledLifetimeManager())
                                    .RegisterInstance(service, new ExternallyControlledLifetimeManager())
