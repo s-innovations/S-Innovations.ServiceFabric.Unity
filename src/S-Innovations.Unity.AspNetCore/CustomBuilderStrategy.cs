@@ -28,8 +28,15 @@ namespace SInnovations.Unity.AspNetCore
 
         private IUnityContainer GetUnityFromBuildContext(IBuilderContext context)
         {
-            var lifetime = context.Policies.Get<ILifetimePolicy>(NamedTypeBuildKey.Make<IUnityContainer>());
-            return lifetime.GetValue() as IUnityContainer;
+            return context.Container;
+            //var lifetime = context.Policies.Get<ILifetimePolicy>(NamedTypeBuildKey.Make<IUnityContainer>());
+            //try
+            //{
+            //    return lifetime.GetValue() as IUnityContainer;
+            //}catch(Exception ex)
+            //{
+            //    return null;
+            //}
         }
 
 

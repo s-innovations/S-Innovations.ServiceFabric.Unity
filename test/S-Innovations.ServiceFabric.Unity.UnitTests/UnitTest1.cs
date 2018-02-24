@@ -1,6 +1,8 @@
 using Unity;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SInnovations.Unity.AspNetCore;
+using Unity.Microsoft.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace SInnovations.ServiceFabric.Unity.UnitTests
 {
@@ -23,8 +25,16 @@ namespace SInnovations.ServiceFabric.Unity.UnitTests
         [TestMethod]
         public void ShouldUseDefaultValue()
         {
+            //My own implementation, works
             var container = new UnityContainer().WithAspNetCoreServiceProvider();
             container.Resolve<MyTestClass>();
+
+
+            //var c = new UnityContainer();
+            //var spf = new ServiceProviderFactory(c);
+
+            //var cc = spf.CreateBuilder(new ServiceCollection());
+            //cc.Resolve<MyTestClass>();
         }
     }
 }
