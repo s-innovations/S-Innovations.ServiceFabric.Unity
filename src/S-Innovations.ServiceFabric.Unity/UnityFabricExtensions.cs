@@ -248,7 +248,7 @@ namespace SInnovations.ServiceFabric.Unity
         private static IUnityContainer MakeServiceContainer<T>(IUnityContainer container, T context, Action<IUnityContainer> scopeRegistrations = null) where T : ServiceContext
         {
 
-            var child = container.CreateChildContainer().IntializeScope();
+            var child = container.IntializeScope();
 
             child.RegisterInstance<ServiceContext>(context, new ExternallyControlledLifetimeManager());
             child.RegisterInstance(context.CodePackageActivationContext, new ExternallyControlledLifetimeManager());
@@ -265,7 +265,8 @@ namespace SInnovations.ServiceFabric.Unity
             {
                 return container.Resolve<IServiceScopeInitializer>().InitializeScope(container);
             }
-            return container;
+
+            return container.CreateChildContainer();
         }
 
     }
