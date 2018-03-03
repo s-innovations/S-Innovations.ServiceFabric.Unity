@@ -151,11 +151,11 @@ namespace SInnovations.Unity.AspNetCore
                 return new SelectedConstructor(newCtor);
             }
         }
-        public override object PreBuildUp(IBuilderContext context)
+        public override void PreBuildUp(IBuilderContext context)
         {
             if (context.Existing != null)
             {
-                return base.PreBuildUp(context);
+                return;
             }
 
 
@@ -168,7 +168,7 @@ namespace SInnovations.Unity.AspNetCore
                     GetUnityFromBuildContext(context), originalSelectorPolicy),
                 context.BuildKey);
 
-            return base.PreBuildUp(context);
+             
 
         }
 

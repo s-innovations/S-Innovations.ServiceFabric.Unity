@@ -26,19 +26,18 @@ namespace SInnovations.Unity.AspNetCore
         /// Do the PreBuildUp stage of construction. This is where the actual work is performed.
         /// </summary>
         /// <param name="context">Current build context.</param>
-        public override object PreBuildUp(IBuilderContext context)
+        public override void PreBuildUp(IBuilderContext context)
         {
           //  Guard.ArgumentNotNull(context, "context");
 
             if (!IsResolvingIEnumerable(context.BuildKey.Type))
             {
-                return base.PreBuildUp(context);
+                return;
             }
-
-            var container = context.NewBuildUp<IUnityContainer>();
-
-            if (container.IsRegistered(context.BuildKey.Type))
-                return base.PreBuildUp(context);
+             
+         
+            if (context.Container.IsRegistered(context.BuildKey.Type))
+                return;
 
             MethodInfo resolverMethod;
             var typeToBuild = GetTypeToBuild(context.BuildKey.Type);
@@ -54,10 +53,10 @@ namespace SInnovations.Unity.AspNetCore
             }
 
             var resolver = (Resolver)Delegate.CreateDelegate(typeof(Resolver), resolverMethod);
-            context.Existing = resolver(context, container);
+            context.Existing = resolver(context, context.Container);
             context.BuildComplete = true;
 
-            return base.PreBuildUp(context);
+          
         }
 
         private static Type GetTypeToBuild(Type type)

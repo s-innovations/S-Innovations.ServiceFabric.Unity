@@ -17,10 +17,7 @@
     <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="3.0.467" />
     <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.0.467" />
     <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
-    <PackageReference Include="Unity" Version="5.7.1" />
-    <PackageReference Include="Unity.Container">
-      <Version>5.7.1</Version>
-    </PackageReference>
+    <PackageReference Include="Unity.Container" Version="5.7.3" />
   </ItemGroup>
 
 </Project>
