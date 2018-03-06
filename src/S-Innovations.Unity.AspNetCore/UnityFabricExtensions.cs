@@ -13,6 +13,10 @@ using Unity.Injection;
 
 namespace SInnovations.Unity.AspNetCore
 {
+    public interface IConfigurationBuilderExtension
+    {
+        IConfigurationBuilder Extend(IConfigurationBuilder cbuilder);
+    }
     public static class UnityFabricExtensions
     {
         /// <summary>
@@ -57,11 +61,31 @@ namespace SInnovations.Unity.AspNetCore
 
         }
 
+        public static IUnityContainer Confiure(this IUnityContainer container, IConfigurationBuilderExtension configurationBuilderExtension)
+        {
+            container.RegisterType<IConfigurationBuilderExtension>(configurationBuilderExtension.GetType().AssemblyQualifiedName, new ContainerControlledLifetimeManager());
+
+
+            return container;
+        }
+
         public static IUnityContainer UseConfiguration(this IUnityContainer container, IConfigurationBuilder builder)
         {
             container.RegisterInstance(builder);
             container.RegisterType<IConfigurationRoot>(new ContainerControlledLifetimeManager(),
-                new InjectionFactory((c) => c.Resolve<IConfigurationBuilder>().Build()));
+                new InjectionFactory((c) =>
+                {
+
+
+                    var extensions = c.Resolve<IEnumerable<IConfigurationBuilderExtension>>();
+                    var cbuilder = c.Resolve<IConfigurationBuilder>();
+                    foreach(var extension in extensions)
+                    {
+                        cbuilder= extension.Extend(cbuilder);
+                    }
+                    return cbuilder.Build();
+
+                    }));
             container.RegisterType<IConfiguration>(new ContainerControlledLifetimeManager(), new InjectionFactory(c => c.Resolve<IConfigurationRoot>()));
 
 
