@@ -61,9 +61,10 @@ namespace SInnovations.Unity.AspNetCore
 
         }
 
-        public static IUnityContainer Confiure(this IUnityContainer container, IConfigurationBuilderExtension configurationBuilderExtension)
+        public static IUnityContainer ConfiureBuilder<T>(this IUnityContainer container)
+            where T : IConfigurationBuilderExtension
         {
-            container.RegisterType<IConfigurationBuilderExtension>(configurationBuilderExtension.GetType().AssemblyQualifiedName, new ContainerControlledLifetimeManager());
+            container.RegisterType<IConfigurationBuilderExtension,T>(typeof(T).AssemblyQualifiedName, new ContainerControlledLifetimeManager());
 
 
             return container;
