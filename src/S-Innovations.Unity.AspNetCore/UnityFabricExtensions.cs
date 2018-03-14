@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Unity.Lifetime;
 using Unity.Injection;
+using Unity.Extension;
 
 namespace SInnovations.Unity.AspNetCore
 {
@@ -95,6 +96,18 @@ namespace SInnovations.Unity.AspNetCore
             //return container.UseConfiguration(builder.Build());
         }
 
+#if NETSTANDARD2_0
+        internal class MyOptionsExtension : UnityContainerExtension
+        {
+            protected override void Initialize()
+            {
+
+            }
+
+            public ILifetimeContainer Lifetime => Context.Lifetime;
+        }
+#endif
+
         /// <summary>
         /// Add AspNet Core Options support to the container
         /// </summary>
@@ -109,11 +122,13 @@ namespace SInnovations.Unity.AspNetCore
 #endif
 
 #if NETSTANDARD2_0
-            return container.RegisterType(typeof(IOptions<>), typeof(OptionsManager<>), new ContainerControlledLifetimeManager())
+            var ext = container.AddExtension(new MyOptionsExtension()).Configure<MyOptionsExtension>();
+
+            return container.RegisterType(typeof(IOptions<>), typeof(OptionsManager<>), new global::Unity.Microsoft.DependencyInjection.Lifetime.InjectionSingletonLifetimeManager(ext.Lifetime))
                 .RegisterType(typeof(IOptionsSnapshot<>), typeof(OptionsManager<>), new HierarchicalLifetimeManager())
-           .RegisterType(typeof(IOptionsMonitor<>), typeof(OptionsMonitor<>), new ContainerControlledLifetimeManager())
+           .RegisterType(typeof(IOptionsMonitor<>), typeof(OptionsMonitor<>), new global::Unity.Microsoft.DependencyInjection.Lifetime.InjectionSingletonLifetimeManager(ext.Lifetime))
             .RegisterType(typeof(IOptionsFactory<>), typeof(OptionsFactory<>), new TransientLifetimeManager())
-           .RegisterType(typeof(IOptionsMonitorCache<>), typeof(OptionsCache<>), new ContainerControlledLifetimeManager());
+           .RegisterType(typeof(IOptionsMonitorCache<>), typeof(OptionsCache<>), new global::Unity.Microsoft.DependencyInjection.Lifetime.InjectionSingletonLifetimeManager(ext.Lifetime));
 #endif
 
         }
