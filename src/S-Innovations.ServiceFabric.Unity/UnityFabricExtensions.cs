@@ -263,11 +263,14 @@ namespace SInnovations.ServiceFabric.Unity
             return child;
         }
 
-        private static IUnityContainer IntializeScope(this IUnityContainer container)
+        public static IUnityContainer IntializeScope(this IUnityContainer container)
         {
             if (container.IsRegistered<IServiceScopeInitializer>())
             {
-                return container.Resolve<IServiceScopeInitializer>().InitializeScope(container);
+                var child= container.Resolve<IServiceScopeInitializer>().InitializeScope(container);
+               
+
+                return child;
             }
 
             return container.CreateChildContainer();
