@@ -10,7 +10,7 @@ namespace SInnovations.Unity.AspNetCore
         {
             // Enumerable strategy
             Context.Strategies.Add(new EnumerableResolutionStrategy(),
-                UnityBuildStage.TypeMapping);
+                UnityBuildStage.Setup);
 
         }
     }

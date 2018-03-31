@@ -11,6 +11,10 @@ using Unity.Extension;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.SignalR;
+using IdentityServer4.Configuration;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Reflection.Emit;
 
 namespace SInnovations.ServiceFabric.Unity.UnitTests
 {
@@ -84,6 +88,191 @@ namespace SInnovations.ServiceFabric.Unity.UnitTests
 
         }
 
+    }
+
+    public class ReplaceTest
+    {
+        private Func<Type, bool> _isTypeExplicitlyRegistered;
+        private Func<Type, string, bool> _isExplicitlyRegistered;
+
+        internal Type GetFinalType(Type argType)
+        {
+
+            Type next;
+            for (var type = argType; null != type; type = next)
+            {
+                var info = type.GetTypeInfo();
+
+                if (type.IsArray)
+                {
+                    next = type.GetElementType();
+                    if (_isTypeExplicitlyRegistered(next)) return next;
+                }
+                else if (info.IsGenericType) //this should be IsEnumerable || IsLazy only ? not all other generics
+                {
+                    var definition = info.GetGenericTypeDefinition();
+                    if (definition == typeof(Lazy<>) || definition == typeof(IEnumerable<>))
+                    {
+
+                        if (_isTypeExplicitlyRegistered(type)) return type;
+
+
+                        if (_isTypeExplicitlyRegistered(definition)) return definition;
+
+                        next = info.GenericTypeArguments[0];
+                        if (_isTypeExplicitlyRegistered(next)) return next;
+                    }
+                    else
+                    {
+                        return type;
+                    }
+                }
+                else
+                {
+                    return type;
+                }
+            }
+
+            return argType;
+        }
+
+        public static IntPtr GetMethodAddress(MethodBase method)
+        {
+            if ((method is DynamicMethod))
+            {
+                unsafe
+                {
+                    byte* ptr = (byte*)GetDynamicMethodRuntimeHandle(method).ToPointer();
+                    if (IntPtr.Size == 8)
+                    {
+                        ulong* address = (ulong*)ptr;
+                        address += 6;
+                        return new IntPtr(address);
+                    }
+                    else
+                    {
+                        uint* address = (uint*)ptr;
+                        address += 6;
+                        return new IntPtr(address);
+                    }
+                }
+            }
+
+            RuntimeHelpers.PrepareMethod(method.MethodHandle);
+
+            unsafe
+            {
+                // Some dwords in the met
+                int skip = 10;
+
+                // Read the method index.
+                UInt64* location = (UInt64*)(method.MethodHandle.Value.ToPointer());
+                int index = (int)(((*location) >> 32) & 0xFF);
+
+                if (IntPtr.Size == 8)
+                {
+                    // Get the method table
+                    ulong* classStart = (ulong*)method.DeclaringType.TypeHandle.Value.ToPointer();
+                    ulong* address = classStart + index + skip;
+                    return new IntPtr(address);
+                }
+                else
+                {
+                    // Get the method table
+                    uint* classStart = (uint*)method.DeclaringType.TypeHandle.Value.ToPointer();
+                    uint* address = classStart + index + skip;
+                    return new IntPtr(address);
+                }
+            }
+        }
+
+        private static IntPtr GetDynamicMethodRuntimeHandle(MethodBase method)
+        {
+            if (method is DynamicMethod)
+            {
+                FieldInfo fieldInfo = typeof(DynamicMethod).GetField("m_method",
+                                      BindingFlags.NonPublic | BindingFlags.Instance);
+                return ((RuntimeMethodHandle)fieldInfo.GetValue(method)).Value;
+            }
+            return method.MethodHandle.Value;
+        }
+
+        public static void ReplaceMethod(IntPtr srcAdr, MethodBase dest)
+        {
+            IntPtr destAdr = GetMethodAddress(dest);
+            unsafe
+            {
+                if (IntPtr.Size == 8)
+                {
+                    ulong* d = (ulong*)destAdr.ToPointer();
+                    *d = *((ulong*)srcAdr.ToPointer());
+                }
+                else
+                {
+                    uint* d = (uint*)destAdr.ToPointer();
+                    *d = *((uint*)srcAdr.ToPointer());
+                }
+            }
+        }
+        public static void ReplaceMethod(MethodBase source, MethodBase dest)
+        {
+            
+            ReplaceMethod(GetMethodAddress(source), dest);
+        }
+
+        public static void Install()
+        {
+            var methodToReplace = typeof(UnityContainer).GetMethod("GetFinalType", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var methodToInject = typeof(ReplaceTest).GetMethod("GetFinalType", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            
+           
+            RuntimeHelpers.PrepareMethod(methodToReplace.MethodHandle);
+            RuntimeHelpers.PrepareMethod(methodToInject.MethodHandle);
+
+            unsafe
+            {
+                if (IntPtr.Size == 4)
+                {
+                    int* inj = (int*)methodToInject.MethodHandle.Value.ToPointer() + 2;
+                    int* tar = (int*)methodToReplace.MethodHandle.Value.ToPointer() + 2;
+#if DEBUG
+                    Console.WriteLine("\nVersion x86 Debug\n");
+
+                    byte* injInst = (byte*)*inj;
+                    byte* tarInst = (byte*)*tar;
+
+                    int* injSrc = (int*)(injInst + 1);
+                    int* tarSrc = (int*)(tarInst + 1);
+
+                    *tarSrc = (((int)injInst + 5) + *injSrc) - ((int)tarInst + 5);
+#else
+                    Console.WriteLine("\nVersion x86 Release\n");
+                    *tar = *inj;
+#endif
+                }
+                else
+                {
+
+                    long* inj = (long*)methodToInject.MethodHandle.Value.ToPointer() + 1;
+                    long* tar = (long*)methodToReplace.MethodHandle.Value.ToPointer() + 1;
+#if DEBUG
+                    Console.WriteLine("\nVersion x64 Debug\n");
+                    byte* injInst = (byte*)*inj;
+                    byte* tarInst = (byte*)*tar;
+
+
+                    int* injSrc = (int*)(injInst + 1);
+                    int* tarSrc = (int*)(tarInst + 1);
+
+                    *tarSrc = (((int)injInst + 5) + *injSrc) - ((int)tarInst + 5);
+#else
+                    Console.WriteLine("\nVersion x64 Release\n");
+                    *tar = *inj;
+#endif
+                }
+            }
+        }
     }
 
     public class Test3
@@ -350,6 +539,39 @@ namespace SInnovations.ServiceFabric.Unity.UnitTests
 
 
         }
+
+        [TestMethod]
+        public void Test13()
+        {
+
+          //  ReplaceTest.Install();
+
+            var c = new UnityContainer();
+            c.AddNewExtension<EnumerableExtension>();
+
+            var sc = new ServiceCollection();
+            sc.AddIdentityServer(o =>
+            {
+                o.Events.RaiseErrorEvents = true;
+            });
+
+            var sp = sc.BuildServiceProvider();
+           
+
+            var test =  sp.GetService<IdentityServerOptions>();
+
+            Assert.IsNotNull(test); //Passes
+
+
+            var sp1 = sc.BuildServiceProvider(c.CreateChildContainer());
+            
+
+            var test1 = sp1.GetService<IdentityServerOptions>();
+
+            Assert.IsNotNull(test1);
+
+        }
+
 
         [TestMethod]
         public void Test10()
