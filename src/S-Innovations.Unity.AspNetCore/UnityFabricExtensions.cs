@@ -12,6 +12,10 @@ using Unity.Lifetime;
 using Unity.Injection;
 using Unity.Extension;
 
+#if NETSTANDARD2_0
+using Unity.Microsoft.DependencyInjection.Lifetime;
+#endif
+
 namespace SInnovations.Unity.AspNetCore
 {
     public interface IConfigurationBuilderExtension
@@ -96,17 +100,7 @@ namespace SInnovations.Unity.AspNetCore
             //return container.UseConfiguration(builder.Build());
         }
 
-#if NETSTANDARD2_0
-        internal class MyOptionsExtension : UnityContainerExtension
-        {
-            protected override void Initialize()
-            {
 
-            }
-
-            public ILifetimeContainer Lifetime => Context.Lifetime;
-        }
-#endif
 
         /// <summary>
         /// Add AspNet Core Options support to the container
@@ -122,13 +116,13 @@ namespace SInnovations.Unity.AspNetCore
 #endif
 
 #if NETSTANDARD2_0
-            var ext = container.AddExtension(new MyOptionsExtension()).Configure<MyOptionsExtension>();
+            var ext = container.AddExtension(new IOptionsExtension()).Configure<IOptionsExtension>();
 
-            return container.RegisterType(typeof(IOptions<>), typeof(OptionsManager<>), new global::Unity.Microsoft.DependencyInjection.Lifetime.InjectionSingletonLifetimeManager(ext.Lifetime))
+            return container.RegisterType(typeof(IOptions<>), typeof(OptionsManager<>), new InjectionSingletonLifetimeManager(ext.Lifetime))
                 .RegisterType(typeof(IOptionsSnapshot<>), typeof(OptionsManager<>), new HierarchicalLifetimeManager())
-           .RegisterType(typeof(IOptionsMonitor<>), typeof(OptionsMonitor<>), new global::Unity.Microsoft.DependencyInjection.Lifetime.InjectionSingletonLifetimeManager(ext.Lifetime))
+           .RegisterType(typeof(IOptionsMonitor<>), typeof(OptionsMonitor<>), new InjectionSingletonLifetimeManager(ext.Lifetime))
             .RegisterType(typeof(IOptionsFactory<>), typeof(OptionsFactory<>), new TransientLifetimeManager())
-           .RegisterType(typeof(IOptionsMonitorCache<>), typeof(OptionsCache<>), new global::Unity.Microsoft.DependencyInjection.Lifetime.InjectionSingletonLifetimeManager(ext.Lifetime));
+           .RegisterType(typeof(IOptionsMonitorCache<>), typeof(OptionsCache<>), new InjectionSingletonLifetimeManager(ext.Lifetime));
 #endif
 
         }

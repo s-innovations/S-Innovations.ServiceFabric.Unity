@@ -547,7 +547,8 @@ namespace SInnovations.ServiceFabric.Unity.UnitTests
           //  ReplaceTest.Install();
 
             var c = new UnityContainer();
-            c.AddNewExtension<EnumerableExtension>();
+            var cc = c.CreateChildContainer();
+            cc.AddNewExtension< IOptionsExtension > ();
 
             var sc = new ServiceCollection();
             sc.AddIdentityServer(o =>
@@ -563,7 +564,7 @@ namespace SInnovations.ServiceFabric.Unity.UnitTests
             Assert.IsNotNull(test); //Passes
 
 
-            var sp1 = sc.BuildServiceProvider(c.CreateChildContainer());
+            var sp1 = sc.BuildServiceProvider(cc.CreateChildContainer());
             
 
             var test1 = sp1.GetService<IdentityServerOptions>();
