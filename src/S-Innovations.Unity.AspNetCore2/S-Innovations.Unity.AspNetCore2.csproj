@@ -31,7 +31,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.0.2" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.0.1" />
     <PackageReference Include="Unity.Container">
-      <Version>5.8.5</Version>
+      <Version>5.8.6</Version>
     </PackageReference>
     <PackageReference Include="Unity.Microsoft.DependencyInjection" Version="2.0.10" />
   </ItemGroup>
