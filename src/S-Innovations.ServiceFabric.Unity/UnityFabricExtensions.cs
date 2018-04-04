@@ -1,4 +1,5 @@
-﻿using Microsoft.ServiceFabric.Actors;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Actors.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using System;
@@ -227,7 +228,20 @@ namespace SInnovations.ServiceFabric.Unity
 
         public static IUnityContainer WithStatelessService<TStatelessService>(this IUnityContainer container, string serviceTypeName, Action<IUnityContainer> scopedRegistrations = null, TimeSpan timeout = default(TimeSpan), CancellationToken cancellationToken = default(CancellationToken)) where TStatelessService : StatelessService
         {
-            ServiceRuntime.RegisterServiceAsync(serviceTypeName, (context) => MakeServiceContainer(container, context, scopedRegistrations).Resolve<TStatelessService>(), timeout, cancellationToken).GetAwaiter().GetResult();
+            ServiceRuntime.RegisterServiceAsync(serviceTypeName, 
+                (context) =>
+                {
+                    var child = MakeServiceContainer(container, context, scopedRegistrations);
+                    try
+                    {
+                        return child.Resolve<TStatelessService>();
+
+                    } catch (Exception ex)
+                    {
+                        child.Resolve<ILoggerFactory>().CreateLogger<TStatelessService>().LogWarning(ex,"Throwing at service factory");
+                        throw;
+                    }
+                }, timeout, cancellationToken).GetAwaiter().GetResult();
             return container;
         }
 
