@@ -651,5 +651,105 @@ namespace SInnovations.ServiceFabric.Unity.UnitTests
 
             //cc.Resolve<MyTestClass>();
         }
+
+
+        [TestMethod]
+        public void TestChilds()
+        {
+            {
+                var root = new UnityContainer();
+                root.RegisterType<AFactory>(new ContainerControlledLifetimeManager());
+                root.RegisterType<IAFactory, AFactory>();
+
+
+                var first = root.Resolve<IAFactory>();
+                var second = root.Resolve<IAFactory>();
+
+                Assert.AreEqual(first, second);
+
+                var child = root.CreateChildContainer();
+
+                var third = child.Resolve<IAFactory>();
+                Assert.AreEqual(first, third);
+            }
+            // third.Disposed = true;
+
+            {
+                var root = new UnityContainer();
+                root.RegisterType<AFactory>(new ContainerControlledLifetimeManager());
+                root.RegisterType<IAFactory, AFactory>();
+
+
+                
+
+              
+
+                var child1 = root.CreateChildContainer();
+                 
+
+                var first = child1.Resolve<IAFactory>();
+                var child2 = root.CreateChildContainer();
+
+                var second = child2.Resolve<IAFactory>();
+                Assert.AreEqual(first, second);
+
+                child1.Dispose();
+
+                global::Unity.Microsoft.DependencyInjection.ServiceProvider.ConfigureServices(new ServiceCollection());
+
+
+            }
+            {
+                var root = new UnityContainer();
+                root.RegisterType<AFactory>(new ContainerControlledLifetimeManager());
+                root.RegisterType<IAFactory, AFactory>();
+
+                var fac = new ServiceProviderFactory(root);
+                var child = fac.CreateBuilder(new ServiceCollection());
+                var sp = fac.CreateServiceProvider(child);
+
+                sp.GetRequiredService<IAFactory>();
+               
+                if(sp is IDisposable dis)
+                {
+                    dis.Dispose();
+                }
+
+                var first = root.Resolve<IAFactory>();
+                var second = root.Resolve<IAFactory>();
+
+                Assert.AreEqual(first, second);
+
+
+            }
+            {
+
+                var test = new UnityContainer();
+            }
+
+
+        }
+
+    }
+
+    public class TestStartup
+    {
+
+    }
+
+    public interface IAFactory : IDisposable
+    {
+        bool Disposed { get; set; }
+    }
+    public class AFactory : IAFactory, IDisposable
+    {
+        public Guid Id { get; set; } = Guid.NewGuid();
+
+        public bool Disposed { get; set; } = false;
+
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

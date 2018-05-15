@@ -16,14 +16,14 @@
     <PackageReference Include="IdentityServer4" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.0.0-preview1-final" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="1.2.1" />
-    <PackageReference Include="MSTest.TestFramework" Version="1.2.1" />
+    <PackageReference Include="MSTest.TestAdapter" Version="1.3.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="1.3.0" />
     <PackageReference Include="Unity.Microsoft.DependencyInjection" Version="2.0.10" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\S-Innovations.ServiceFabric.Unity\S-Innovations.ServiceFabric.Unity.csproj" />
-    <ProjectReference Include="..\..\src\S-Innovations.Unity.AspNetCore2\S-Innovations.Unity.AspNetCore2.csproj" />
+    <ProjectReference Include="..\..\src\S-Innovations.Unity.AspNetCore\S-Innovations.Unity.AspNetCore.csproj" />
   </ItemGroup>
 
 </Project>

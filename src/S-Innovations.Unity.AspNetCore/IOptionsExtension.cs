@@ -22,8 +22,8 @@ namespace SInnovations.Unity.AspNetCore
             Context.Policies.Set(typeof(OptionsFactory<>), string.Empty, typeof(IBuildPlanCreatorPolicy), new OptionsFactoryBuilderPlanCreatorPolicy(Context.Policies));
 
 
-
-        }
+      
+        }  
         public ILifetimeContainer Lifetime => Context.Lifetime;
 
         public class OptionsFactoryBuilderPlanCreatorPolicy : IBuildPlanCreatorPolicy
