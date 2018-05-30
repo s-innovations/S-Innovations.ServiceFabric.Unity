@@ -7,16 +7,15 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <Version>2.1.0</Version>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="UnityGlueConfiguration.cs" />
-  </ItemGroup>
+ 
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.2" />
-    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="3.1.274" />
-    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.1.274" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.0" />
+    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="3.1.283" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.1.283" />
     <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
     <PackageReference Include="Unity.Container" Version="5.8.6" />
   </ItemGroup>
