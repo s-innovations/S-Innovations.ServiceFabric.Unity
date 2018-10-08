@@ -199,6 +199,7 @@ namespace SInnovations.ServiceFabric.Unity
                                    .IntializeScope()
                                    .RegisterInstance(service.Context.CodePackageActivationContext, new ExternallyControlledLifetimeManager())
                                    .RegisterInstance(service, new ExternallyControlledLifetimeManager())
+                                  // .RegisterInstance(service as TActorService, new ExternallyControlledLifetimeManager())
                                    .RegisterInstance(id, new ContainerControlledLifetimeManager()).Resolve<TActor>());
                 }
                 catch (Exception ex)
