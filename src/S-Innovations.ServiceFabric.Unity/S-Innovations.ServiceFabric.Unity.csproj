@@ -13,11 +13,11 @@
  
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.1" />
-    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="3.2.187" />
-    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.2.187" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="3.3.617" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.3.617" />
     <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
-    <PackageReference Include="Unity.Container" Version="5.8.11" />
+    <PackageReference Include="Unity.Container" Version="5.8.12" />
   </ItemGroup>
 
 </Project>
